@@ -7,6 +7,7 @@ import Image
 
 from django.db import models
 from django.db.models import signals
+from django.db.models.loading import AppCache
 from django.conf import settings
 from django.utils.functional import curry
 from django.core.validators import ValidationError
@@ -275,8 +276,27 @@ class PhotoSize(models.Model):
         return (self.width, self.height)
 
 
-# Just a little instrospection...
-# The following MUST come after the model definition.
+"""
+Just a little instrospection...
+
+The following MUST come after the model definitions.
+"""
+
+# Add the TagFields to models if django-tagging is found.
+if "tagging" in AppCache().app_models:
+    try:
+        from tagging.fields import TagField
+    except ImportError:
+        pass
+    else:
+        tag_field = TagField(maxlength=255,
+                             help_text="Tags may not contain spaces. Seperate \
+                                        multiple tags with a space or comma.")
+        Gallery.add_to_class('tags', tag_field)
+        Photo.add_to_class('tags', tag_field)
+
+
+# Set up the accessor methods
 def add_methods(sender, instance, signal, *args, **kwargs):
     """ Adds methods to access sized images (urls, paths)
 
