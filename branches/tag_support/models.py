@@ -283,7 +283,6 @@ class PhotoSize(models.Model):
 """
 Just a little instrospection...
 
-The following MUST come after the model definitions.
 """
 
 # Add the TagFields to models if django-tagging is found.
@@ -293,8 +292,7 @@ if "tagging" in AppCache().app_models:
     except ImportError:
         pass
     else:
-        tag_field = TagField(maxlength=255,
-                             help_text="Tags may not contain spaces. Seperate \
+        tag_field = TagField(help_text="Tags may not contain spaces. Seperate \
                                         multiple tags with a space or comma.")
         Gallery.add_to_class('tags', tag_field)
         Photo.add_to_class('tags', tag_field)
