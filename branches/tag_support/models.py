@@ -16,7 +16,11 @@ from django.dispatch import dispatcher
 from django.template.defaultfilters import slugify
 
 
-PHOTOLOGUE_DIR = 'photologue'
+# Get relative media path
+try:
+    PHOTOLOGUE_DIR = settings.PHOTOLOGUE_DIR
+except:
+    PHOTOLOGUE_DIR = 'photologue'
 
 
 class Gallery(models.Model):
