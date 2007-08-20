@@ -2,14 +2,14 @@ Some usage tips and some features that may not be obvious.
 
 == Upload a .zip file ==
 
-To upload a gallery of images at once as a zip file just "add" a "GalleryUpload", select the zip file and fill in the required fields.
+To upload a gallery of images at once as a zip file just "add" a `GalleryUpload`, select the zip file and fill in the required fields.
 
 == Admin Thumnails ==
 
-To get a thumnail preview of your photos in the Django admin just define a PhotoSize with the name "thumbnail".
+To get a thumnail preview of your photos in the Django admin just define a `PhotoSize` with the name "thumbnail".
 
 {{{
 PhotoSize.objects.create(name="thumbnail", width=100, height=75)
 }}}
 
-Of course you can also define PhotoSizes through the Admin interface.
+Of course you can also define `PhotoSizes` through the Admin interface.
