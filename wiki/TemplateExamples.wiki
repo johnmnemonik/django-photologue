@@ -36,3 +36,37 @@ In the template:
 
 }}}
 
+
+== 1. Display a Gallery ==
+
+to display a image in a custom view (assumes that you have a `PhotoSize` defined with the name "display" and a `Gallery` with the title "My gallery" in the database):
+
+{{{
+from django.shortcuts import render_to_response
+from django_apps.photologue.models import Gallery
+
+def view_gallery(request):
+    gallery = Gallery.objects.get(title="My gallery")
+    render_to_response('view_gallery.html', {'gallery': gallery})
+}}}
+
+In the template:
+
+{{{
+ 
+{% extends "my_base_template.html" %}
+
+{% block title %}My Gallery{% endblock %}
+
+{% block content %}
+
+<h1>My Gallery</h1>
+<div class="photo-gallery">
+<h2>{{ gallery.title }}</h2>
+{% for photo in gallery.photos.all() %}
+    <a href="{{ photo.get_absolute_url() }}"><img src="{{ photo.get_display_url() }}" alt="{{ photo.title }}"/></a>
+{% endfor %}
+</div>
+{% endblock %}
+
+}}}
