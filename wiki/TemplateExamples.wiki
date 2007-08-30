@@ -79,6 +79,7 @@ In the template:
     <a href="{{ photo.get_absolute_url() }}"><img src="{{ photo.get_display_url() }}" alt="{{ photo.title }}"/></a>
 {% endfor %}
 </div>
+
 {% endblock %}
 
 }}}
