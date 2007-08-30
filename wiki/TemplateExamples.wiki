@@ -18,7 +18,7 @@ Inserting images into your other page templates is easy. I recommend building a 
 
 == 1. Display a Photo ==
 
-to display a image in a custom view (assumes that you have a `PhotoSize` defined with the name "thumbnail" and a `Photo` with the title "My photo" in the database):
+to display a image in a custom view (assumes that you have a `PhotoSize` defined with the name "display" and a `Photo` with the title "My photo" in the database):
 
 {{{
 from django.shortcuts import render_to_response
@@ -40,7 +40,7 @@ In the template:
 {% block content %}
 
 <h1>My Photo</h1>
-<a href="{{ photo.get_absolute_url() }}"><img src="{{ photo.get_thumbnail_url() }}" alt="{{ photo.title }}"/></a>
+<a href="{{ photo.get_absolute_url() }}"><img src="{{ photo.get_display_url() }}" alt="{{ photo.title }}"/></a>
 
 {% endblock %}
 
@@ -49,7 +49,7 @@ In the template:
 
 == 1. Display a Gallery ==
 
-to display a image in a custom view (assumes that you have a `PhotoSize` defined with the name "display" and a `Gallery` with the title "My gallery" in the database):
+to display a image in a custom view (assumes that you have a `PhotoSize` defined with the name "thumbnail" and a `Gallery` with the title "My gallery" in the database):
 
 {{{
 from django.shortcuts import render_to_response
