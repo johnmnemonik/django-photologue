@@ -3,7 +3,7 @@ How to use photos and galleries in your templates
 
 = Introduction =
 
-I've created a set of templates to use as a starting point. These templates coincide with the generic views defined in the applications `urls.py` file.
+I've created a set of templates to use as a starting point. These templates coincide with the generic views defined in `urls.py`.
 
 = Installing the sample templates =
 
