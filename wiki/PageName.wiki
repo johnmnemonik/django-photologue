@@ -1,0 +1,40 @@
+At this time installation requires a [http://subversion.tigris.org/ subversion] client.
+
+= Installation =
+
+To install create a folder (module) named `django_apps` with an `__init__.py` file somewhere on your python path (such as `Lib/site-packages`). From within that new folder run:
+
+{{{
+svn checkout http://django-photologue.googlecode.com/svn/trunk/photologue/ photologue
+}}}
+
+Add the app your installed_apps setting:
+
+{{{
+INSTALLED_APPS = (
+    # other installed apps
+    'django_apps.photologue',
+)
+}}}
+
+Add this to `yourproject.urls`:
+
+{{{
+urlpatterns += patterns('',
+	(r'^photologue/', include('django_apps.photologue.urls')),
+)
+}}}
+
+Optionally, create a new `PhotoSize` through the Django admin or shell named `thumbnail` and you will get thumbnail previews in the admin interface.
+
+From the shell:
+{{{
+from django_apps.photologue.models import PhotoSize
+PhotoSize.objects.create(name='thumbnail', width=100, height=75)
+}}}
+
+Check out the [http://code.google.com/p/django-photologue/wiki/TemplateExamples example templates] into one of your TEMPLATE_DIRS and modify as needed.
+
+Be sure your MEDIA_URL and MEDIA_ROOT settings are correct.
+
+
