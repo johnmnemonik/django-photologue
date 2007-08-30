@@ -12,6 +12,8 @@ To use the sample templates, open a terminal/command prompt and run the followin
 svn checkout http://django-photologue.googlecode.com/svn/extras/templates photologue
 }}}
 
+You will also need to create a base template with the filename `base.html` with blocks defined for `title` and `content`. 
+
 = Additional Examples =
 
 Inserting images into your other page templates is easy. I recommend building a set of template snippets and css styles and using [http://www.djangoproject.com/documentation/templates_python/#inclusion-tags inclusion tags] to keep a unified look throughout your site.
