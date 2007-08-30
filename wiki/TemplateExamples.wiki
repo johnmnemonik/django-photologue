@@ -1,0 +1,39 @@
+How to use photos and galleries in your templates
+
+= Introduction =
+
+Inserting images into your templates is easy. I recommend building a set of template snippets and css styles and using [http://www.djangoproject.com/documentation/templates_python/#inclusion-tags inclusion tags] to keep a unified look throughout your site.
+
+= Examples =
+
+== 1. Display a Photo ==
+
+to display a image in a custom view (assumes that you have a PhotoSize defined with the name `display` and a Photo with the title `My photo` in the database):
+
+{{{
+from django.shortcuts import render_to_response
+from django_apps.photologue.models import Photo
+
+def view_photo(request):
+    photo = Photo.objects.get(title="My photo")
+    render_to_response('view_photo.html', {'photo': photo})
+}}}
+
+In the template:
+
+{{{
+ 
+{% extends "my_base_template.html" %}
+
+{% block title %}My Photo{% endblock %}
+
+{% block content %}
+
+<h1>My Photo</h1>
+<a href="{{ photo.get_absolute_url() }}"><img src="{{ photo.get_display_url() }}" alt="{{ photo.title }}"/></a>
+
+{% endblock %}
+
+}}}
+
+
