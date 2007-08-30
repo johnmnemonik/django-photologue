@@ -2,9 +2,19 @@ How to use photos and galleries in your templates
 
 = Introduction =
 
-Inserting images into your templates is easy. I recommend building a set of template snippets and css styles and using [http://www.djangoproject.com/documentation/templates_python/#inclusion-tags inclusion tags] to keep a unified look throughout your site.
+I've created a set of templates to use as a starting point. These templates coincide with the generic views defined in the applications `urls.py` file. These templates we're modified (rather hastily) from an existing site so if you find any errors please file an issue or submit a patch. 
 
-= Examples =
+= Installing the sample templates =
+
+To use the sample templates, open a terminal/command prompt and run the following command from within one of your defined `TEMPLATE_DIRS`:
+
+{{{
+svn checkout http://django-photologue.googlecode.com/svn/extras/templates photologue
+}}}
+
+= Additional Examples =
+
+Inserting images into your other page templates is easy. I recommend building a set of template snippets and css styles and using [http://www.djangoproject.com/documentation/templates_python/#inclusion-tags inclusion tags] to keep a unified look throughout your site.
 
 == 1. Display a Photo ==
 
