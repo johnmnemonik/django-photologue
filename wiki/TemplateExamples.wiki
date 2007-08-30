@@ -8,7 +8,7 @@ Inserting images into your templates is easy. I recommend building a set of temp
 
 == 1. Display a Photo ==
 
-to display a image in a custom view (assumes that you have a PhotoSize defined with the name `display` and a Photo with the title `My photo` in the database):
+to display a image in a custom view (assumes that you have a `PhotoSize` defined with the name "display" and a `Photo` with the title "My photo" in the database):
 
 {{{
 from django.shortcuts import render_to_response
@@ -35,5 +35,4 @@ In the template:
 {% endblock %}
 
 }}}
-
 
