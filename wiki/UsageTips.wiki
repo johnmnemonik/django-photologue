@@ -1,3 +1,4 @@
+#labels Featured
 Some usage tips and some features that may not be obvious.
 
 == Upload a .zip file ==
