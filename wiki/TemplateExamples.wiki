@@ -43,7 +43,7 @@ In the template:
 {% block content %}
 
 <h1>My Photo</h1>
-<a href="{{ photo.get_absolute_url() }}"><img src="{{ photo.get_display_url() }}" alt="{{ photo.title }}"/></a>
+<a href="{{ photo.get_absolute_url }}"><img src="{{ photo.get_display_url }}" alt="{{ photo.title }}"/></a>
 
 {% endblock %}
 
@@ -76,8 +76,8 @@ In the template:
 <h1>My Gallery</h1>
 <div class="photo-gallery">
 <h2>{{ gallery.title }}</h2>
-{% for photo in gallery.photos.all() %}
-    <a href="{{ photo.get_absolute_url() }}"><img src="{{ photo.get_display_url() }}" alt="{{ photo.title }}"/></a>
+{% for photo in gallery.photos.all %}
+    <a href="{{ photo.get_absolute_url }}"><img src="{{ photo.get_display_url }}" alt="{{ photo.title }}"/></a>
 {% endfor %}
 </div>
 
