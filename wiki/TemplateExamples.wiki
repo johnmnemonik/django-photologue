@@ -13,7 +13,7 @@ To use the sample templates, open a terminal/command prompt and run the followin
 svn checkout http://django-photologue.googlecode.com/svn/extras/templates photologue
 }}}
 
-Then create a base template with the filename `base.html` with blocks defined for "title" and "content" and define two `PhotoSizes`, "thumbnail" and "display".
+Then create a base template with the filename "base.html" with blocks defined for "title" and "content" and define two `PhotoSizes`, "thumbnail" and "display".
 
 = Additional Examples =
 
