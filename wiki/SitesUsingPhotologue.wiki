@@ -1,0 +1,7 @@
+#labels Featured
+Sites using django-photologue for image management.
+
+= Sites using Photologue: =
+
+==[http://chimes.biola.edu/ http://chimes.biola.edu/]==
+Biola University's student student newspaper site is among several planned University sites to use Photologue for image management. Developed from concept to completion in about a month, the Biola University site is a great example of rapid development with Django and a personal point of pride that some of my code helped make this possible.
