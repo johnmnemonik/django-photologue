@@ -89,16 +89,19 @@ class GalleryUpload(models.Model):
                                              slug=slugify(self.title_prefix),
                                              description=self.description)
             for filename in zip.namelist():
+                if filename.startswith('__'): # do not process meta files
+                    continue
                 data = zip.read(filename)
-                title = ' '.join([self.title_prefix, str(count)])
-                slug = slugify(title)
-                photo = Photo(title=title, slug=slug,
-                              caption=self.caption,
-                              photographer=self.photographer,
-                              info=self.info)
-                photo.save_image_file(filename, data)
-                gallery.photos.add(photo)
-                count = count + 1
+                if len(data):
+                    title = ' '.join([self.title_prefix, str(count)])
+                    slug = slugify(title)
+                    photo = Photo(title=title, slug=slug,
+                                  caption=self.caption,
+                                  photographer=self.photographer,
+                                  info=self.info)
+                    photo.save_image_file(filename, data)
+                    gallery.photos.add(photo)
+                    count = count + 1
             zip.close()
 
 
