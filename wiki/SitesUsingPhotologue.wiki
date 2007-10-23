@@ -1,4 +1,3 @@
-#labels Featured
 Sites using django-photologue for image management.
 
 = Sites using Photologue: =
