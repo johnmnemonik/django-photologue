@@ -20,4 +20,4 @@ Be sure your MEDIA_URL and MEDIA_ROOT settings are correct!
 OPTIONAL STEPS
 
 1. Create a new PhotoSize with the name "thumbnail" to get thumbnail previews in the admin interface (optional).
-2. Check out the example templates (url) into one of your TEMPLATE_DIRS and modify as needed.
+2. Copy the included example templates into one of your TEMPLATE_DIRS (under a subdirectory named "photologue") and modify as needed.
