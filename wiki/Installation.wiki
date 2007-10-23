@@ -1,5 +1,5 @@
 #labels Featured
-= Installation =
+= Install Photologue =
 
 == Get The Files ==
 
