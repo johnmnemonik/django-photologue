@@ -20,7 +20,13 @@ INSTALLED_APPS = (
 )
 }}}
 
-Add this to yourproject.urls:
+Be sure your MEDIA_URL and MEDIA_ROOT settings are correct!
+
+== Optional Steps ==
+
+Create a new PhotoSize with the name "thumbnail" to get thumbnail previews in the admin interface.
+
+Add the following to yourproject.urls...
 
 {{{
 urlpatterns += patterns('',
@@ -28,10 +34,4 @@ urlpatterns += patterns('',
 )
 }}}
 
-Be sure your MEDIA_URL and MEDIA_ROOT settings are correct!
-
-== Optional Steps ==
-
-Create a new PhotoSize with the name "thumbnail" to get thumbnail previews in the admin interface.
-
-Copy the included example templates into one of your TEMPLATE_DIRS (under a subdirectory named "photologue") and modify as needed.
+..and copy the included example templates into one of your TEMPLATE_DIRS (under a subdirectory named "photologue") and modify as needed.
