@@ -22,11 +22,13 @@ INSTALLED_APPS = (
 
 Be sure your MEDIA_URL and MEDIA_ROOT settings are correct!
 
+== Admin Thumbnails ==
+
+Create a new `PhotoSize` with the name "thumbnail" to get thumbnail previews in the admin interface.
+
 == Optional Steps ==
 
-Create a new PhotoSize with the name "thumbnail" to get thumbnail previews in the admin interface.
-
-Add the following to yourproject.urls...
+Add the following to yourproject.urls:
 
 {{{
 urlpatterns += patterns('',
@@ -34,4 +36,4 @@ urlpatterns += patterns('',
 )
 }}}
 
-..and copy the included example templates into one of your TEMPLATE_DIRS (under a subdirectory named "photologue") and modify as needed.
+Copy the included example templates into one of your TEMPLATE_DIRS (under a subdirectory named "photologue") and modify as needed.
