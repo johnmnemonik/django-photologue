@@ -5,15 +5,11 @@ How to use photos and galleries in your templates
 
 I've created a set of templates to use as a starting point. These templates coincide with the generic views defined in `urls.py`.
 
+*Note:* The sample templates are now included with 0.4 release and are included when with  the trunk revision.
+
 = Installing the sample templates =
 
-To use the sample templates, open a terminal/command prompt and run the following command from within one of your defined `TEMPLATE_DIRS`:
-
-{{{
-svn checkout http://django-photologue.googlecode.com/svn/extras/templates photologue
-}}}
-
-Then create a base template with the filename "base.html" with blocks defined for "title" and "content" and define two `PhotoSizes`, "thumbnail" and "display".
+Create a base template with the filename "base.html" with blocks defined for "title" and "content" and define two `PhotoSizes`, "thumbnail" and "display".
 
 = Additional Examples =
 
