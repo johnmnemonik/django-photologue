@@ -1,10 +1,12 @@
 #labels Featured
 List of changes with each new release.
 
+=== Photologue 0.5.0 ===
+  * Application no longer attempts to add TagFields to models at run time.
+
 === Photologue 0.4.2 ===
   * Fixed a bug regarding floats being passed to PIL upon resize of cropped images.
   * Added missing pagination navigation to the photo_list example template.
-
 
 === Photologue 0.4.1 ===
   * Added a check for invalid files within the uploaded archive while processing.
