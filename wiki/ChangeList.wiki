@@ -1,6 +1,15 @@
 #labels Featured
 List of changes with each new release.
 
+=== Photologue 0.6.0 ===
+  * Added JPEG quality setting.
+  * Added the ability to define filter sets at the photo size and photo levels.
+  * Added the option to specify crop the crop origin on a per photo basis.
+
+=== Photologue 0.5.1 ===
+  * Imports are now relative.
+  * Images will not be resized if the original dimensions match the target photo size.
+
 === Photologue 0.5.0 ===
   * Application no longer attempts to add TagFields to models at run time.
 
