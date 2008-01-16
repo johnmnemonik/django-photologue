@@ -2,6 +2,9 @@
 List of changes with each new release.
 
 === Photologue 0.6.0 ===
+  * Fixed bug that prevented cropped images from resizing.
+
+=== Photologue 0.6.0 ===
   * Added JPEG quality setting.
   * Added the ability to define filter sets at the photo size and photo levels.
   * Added the option to specify crop the crop origin on a per photo basis.
