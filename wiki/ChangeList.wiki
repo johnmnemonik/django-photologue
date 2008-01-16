@@ -1,7 +1,7 @@
 #labels Featured
 List of changes with each new release.
 
-=== Photologue 0.6.0 ===
+=== Photologue 0.6.1 ===
   * Fixed bug that prevented cropped images from resizing.
 
 === Photologue 0.6.0 ===
