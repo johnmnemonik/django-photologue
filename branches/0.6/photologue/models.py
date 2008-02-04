@@ -4,6 +4,7 @@ import zipfile
 
 from datetime import datetime
 import Image
+import ImageFile
 import ImageFilter
 from inspect import isclass
 
@@ -16,12 +17,11 @@ from django.core.urlresolvers import reverse
 from django.dispatch import dispatcher
 from django.template.defaultfilters import slugify
 
+# Photologue image path relative to media root
+PHOTOLOGUE_DIR = getattr(settings, 'PHOTOLOGUE_DIR', 'photologue')
 
-# Get relative media path
-try:
-    PHOTOLOGUE_DIR = settings.PHOTOLOGUE_DIR
-except:
-    PHOTOLOGUE_DIR = 'photologue'
+# Modify image file buffer size if set, otherwise keep PIL default (64k)
+ImageFile.MAXBLOCK = getattr(settings, 'PHOTOLOGUE_MAXBLOCK', 64*1024)
 
 # Prepare a list of image filters
 IMAGE_FILTER_CHOICES = []
@@ -312,11 +312,17 @@ class Photo(models.Model):
                 filter = getattr(ImageFilter, f.name, None)
                 if filter is not None:
                     resized = resized.filter(filter)
-        if im.format == 'JPEG':
-            resized.save(getattr(self, "get_%s_path" % photosize.name)(),
-                         'JPEG', quality=photosize.quality, optimize=True)
-        else:
-            resized.save(getattr(self, "get_%s_path" % photosize.name)())
+        resized_filename = getattr(self, "get_%s_path" % photosize.name)()
+        try:
+            if im.format == 'JPEG':
+                resized.save(resized_filename, 'JPEG', quality=photosize.quality,
+                             optimize=True)
+            else:
+                resized.save(resized_filename)
+        except IOError, e:
+            if os.path.isfile(resized_filename):
+                os.unlink(resized_filename)
+            raise e
 
     def remove_size(self, photosize, remove_dirs=True):
         if not self.size_exists(photosize):
