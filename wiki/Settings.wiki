@@ -1,0 +1,16 @@
+#labels Featured
+#Photologue configuration settings
+
+The following settings can be overridden in your sites settings.py file:
+
+=== PHOTOLOGUE_DIR ===
+Default: 'photologue'
+
+The relative path (from your MEDIA_ROOT setting) where photologue will store image files.
+
+=== PHOTOLOGUE_MAXBLOCK ===
+_New in Trunk > Rev 96_
+
+Default: 64*1024
+
+Overides the default ImageFile.MAXBLOCK buffer size. Setting this value higher may help avoid [http://code.google.com/p/django-photologue/issues/detail?id=11 Issue #11].
