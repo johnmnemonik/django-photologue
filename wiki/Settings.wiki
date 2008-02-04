@@ -1,6 +1,4 @@
 #labels Featured
-#Photologue configuration settings
-
 The following settings can be overridden in your sites settings.py file:
 
 === PHOTOLOGUE_DIR ===
