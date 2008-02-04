@@ -1,6 +1,9 @@
 #labels Featured
 List of changes with each new release.
 
+=== Photologue 0.6.2 ===
+  * Added PHOTOLOGUE_MAXBLOCK setting as a workaround for [http://code.google.com/p/django-photologue/issues/detail?id=11 issue 11].
+
 === Photologue 0.6.1 ===
   * Fixed bug that prevented cropped images from resizing.
 
