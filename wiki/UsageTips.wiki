@@ -10,7 +10,7 @@ To upload a gallery of images at once as a zip file just "add" a `GalleryUpload`
 To get a thumbnail preview of your photos in the Django admin just define a `PhotoSize` with the name "thumbnail".
 
 {{{
-PhotoSize.objects.create(name="thumbnail", width=100, height=75)
+PhotoSize.objects.create(name="thumbnail", width=100, height=75, quality=80)
 }}}
 
 Of course you can also define `PhotoSizes` through the Admin interface.
