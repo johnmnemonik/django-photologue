@@ -1,39 +1,37 @@
 #labels Featured
 = Install Photologue =
 
+* Note: The following instructions are for the 0.5 branch and later *
+
 == Get The Files ==
 
-You can download the "stable" version of Photologue [http://code.google.com/p/django-photologue/downloads/list here] or you can check out the newest version using subversion from [http://django-photologue.googlecode.com/svn/trunk/photologue/ http://django-photologue.googlecode.com/svn/trunk/photologue/].
+You can download the latest release of Photologue [http://code.google.com/p/django-photologue/downloads/list here] or you can check out the newest version using subversion from [http://django-photologue.googlecode.com/svn/trunk/photologue/ http://django-photologue.googlecode.com/svn/trunk/photologue/].
 
 == Install The App ==
 
-Create a new directory named "django_apps" somewhere on your Python path (such as Lib/site-packages).
+Unzip or copy the Photogue application directory into your project directory (where your settings.py file is.
 
-Unzip or copy the Photogue application directory into your "django_apps" directory.
-
-Add "django_apps.photologue" your installed_apps setting:
+Add "photologue" your installed_apps setting:
 
 {{{
 INSTALLED_APPS = (
     # other installed apps
-    'django_apps.photologue',
+    'photologue',
 )
 }}}
 
-Be sure your MEDIA_URL and MEDIA_ROOT settings are correct!
-
-== Admin Thumbnails ==
-
-Create a new `PhotoSize` with the name "thumbnail" to get thumbnail previews in the admin interface.
-
-== Optional Steps ==
+*Be sure your MEDIA_URL and MEDIA_ROOT settings are correct!*
 
 Add the following to yourproject.urls:
 
 {{{
 urlpatterns += patterns('',
-        (r'^photologue/', include('django_apps.photologue.urls')),
+        (r'^photologue/', include('photologue.urls')),
 )
 }}}
 
 Copy the included example templates into one of your TEMPLATE_DIRS (under a subdirectory named "photologue") and modify as needed.
+
+== Admin Thumbnails ==
+
+Create a new `PhotoSize` with the name "thumbnail" to get thumbnail previews in the admin interface.
