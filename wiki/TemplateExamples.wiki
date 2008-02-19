@@ -5,8 +5,6 @@ How to use photos and galleries in your templates
 
 I've created a set of templates to use as a starting point. These templates coincide with the generic views defined in `urls.py`.
 
-*Note:* The sample templates are now included with 0.4.x releases and with the trunk revision.
-
 = Installing the sample templates =
 
 Create a base template with the filename "base.html" with blocks defined for "title" and "content" and define two `PhotoSizes`, "thumbnail" and "display".
