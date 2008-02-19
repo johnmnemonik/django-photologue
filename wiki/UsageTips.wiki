@@ -18,3 +18,7 @@ To get better looking thumbnails, create a `FilterSet` and add the "Sharpen" fil
 == Upload A .zip File ==
 
 To upload a gallery of images at once as a zip file just "add" a `GalleryUpload`, select the zip file and fill in the required fields.
+
+== Integrate With Other Apps ==
+
+Photologue is designed to integrate easily with other Django applications. Wherever you need to upload, store and display images in a Django site a foreign key to `photologue.models.Photo` can be used instead of an `ImageField`, giving you the advantages of automatic resizing, image filters, an easier to maintain disk structure and more.
