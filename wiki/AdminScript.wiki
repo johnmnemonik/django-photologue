@@ -1,4 +1,4 @@
-#pl-admin.py - Photologue administration script.
+"pl-admin.py" - A Photologue administration script.
 
 === Available Commands: ===
   
