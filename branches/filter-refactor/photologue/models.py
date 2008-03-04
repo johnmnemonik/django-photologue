@@ -47,6 +47,8 @@ except ImportError:
     
 from util import EXIF
 
+# Path to sample image
+SAMPLE_IMAGE_PATH = getattr(settings, 'SAMPLE_IMAGE_PATH', os.path.join(os.path.dirname(__file__), 'res', 'sample.jpg')) # os.path.join(settings.PROJECT_PATH, 'photologue', 'res', 'sample.jpg'
 
 # Photologue image path relative to media root
 PHOTOLOGUE_DIR = getattr(settings, 'PHOTOLOGUE_DIR', 'photologue')
@@ -419,7 +421,7 @@ class Photo(models.Model):
 
 class PhotoEffect(models.Model):
     """ A pre-defined effect to apply to photos """
-    name = models.CharField(max_length=30)
+    name = models.CharField(max_length=30, unique=True)
     color = models.FloatField(default=1.0, help_text="A factor of 0.0 gives a black and white image, a factor of 1.0 gives the original image.")
     brightness = models.FloatField(default=1.0, help_text="A factor of 0.0 gives a black image, a factor of 1.0 gives the original image.")
     contrast = models.FloatField(default=1.0, help_text="A factor of 0.0 gives a solid grey image, a factor of 1.0 gives the original image.")
@@ -427,11 +429,32 @@ class PhotoEffect(models.Model):
     filters = models.CharField(max_length=200, blank=True, help_text=image_filters_help_text)
     
     class Admin:
-        list_display = ['name', 'color', 'brightness', 'contrast', 'sharpness', 'filters']
+        list_display = ['name', 'color', 'brightness', 'contrast', 'sharpness', 'filters', 'admin_sample']
         
     def __unicode__(self):
         return self.name
         
+    def sample_dir(self):
+        return os.path.join(settings.MEDIA_ROOT, PHOTOLOGUE_DIR, 'samples')
+        
+    def sample_url(self):
+        return settings.MEDIA_URL + '/'.join([PHOTOLOGUE_DIR, 'samples', '%s %s.jpg' % (self.name.lower(), 'sample')])
+    
+    def sample_filename(self):
+        return os.path.join(self.sample_dir(), '%s %s.jpg' % (self.name.lower(), 'sample'))    
+        
+    def create_sample(self):
+        if not os.path.isdir(self.sample_dir()):
+            os.makedirs(self.sample_dir())
+        im = Image.open(SAMPLE_IMAGE_PATH)
+        im = self.process(im)
+        im.save(self.sample_filename(), 'JPEG', quality=90, optimize=True)
+        
+    def admin_sample(self):
+        return u'<img src="%s">' % self.sample_url()
+    admin_sample.short_description = 'Sample'
+    admin_sample.allow_tags = True
+    
     def process(self, im):
         if im.mode != 'RGB':
             return im
@@ -455,6 +478,14 @@ class PhotoEffect(models.Model):
         for size in self.photo_sizes.all():
             size.clear_cache()
         super(PhotoEffect, self).save()
+        self.create_sample()
+        
+    def delete(self):
+        try:
+            os.remove(self.sample_filename())
+        except:
+            pass
+        super(PhotoEffect, self).delete()
             
 
 class PhotoSize(models.Model):
