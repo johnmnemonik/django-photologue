@@ -223,8 +223,7 @@ class Photo(models.Model):
         get_latest_by = 'pub_date'
 
     class Admin:
-        list_display = ('title', 'date_taken', 'pub_date', 'photographer',
-                        'admin_thumbnail')
+        list_display = ('title', 'date_taken', 'pub_date', 'photographer', 'is_public', 'tags', 'admin_thumbnail')
         list_filter = ['pub_date', 'is_public']
         list_per_page = 10
 
@@ -477,7 +476,7 @@ class PhotoSize(models.Model):
         ordering = ['width', 'height']
 
     class Admin:
-        list_display = ('name', 'width', 'height', 'crop', 'pre_cache')
+        list_display = ('name', 'width', 'height', 'crop', 'pre_cache', 'effect')
 
     def __unicode__(self):
         return self.name
