@@ -1,5 +1,5 @@
 #labels Featured
-The following settings can be overridden in your sites settings.py file:
+The following settings are option and can be overridden in your project's settings file:
 
 === PHOTOLOGUE_DIR ===
 Default: 'photologue'
@@ -12,3 +12,8 @@ _New in Trunk > Rev 96_
 Default: 256*1024
 
 Overides the default ImageFile.MAXBLOCK buffer size. Setting this value higher may help avoid [http://code.google.com/p/django-photologue/issues/detail?id=11 Issue #11].
+
+=== SAMPLE_IMAGE_PATH ===
+default: 'photologue/res/sample.jpg'
+
+Absolute path to the image file you wish to use as the sample image for photo effect previews (must be a jpeg).
