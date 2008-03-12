@@ -43,6 +43,8 @@ except ImportError:
             default_kwargs = {'max_length': 255, 'blank': True}
             default_kwargs.update(kwargs)
             super(TagField, self).__init__(**default_kwargs)
+        def get_internal_type(self):
+            return 'CharField'
     tagfield_help_text = 'Django-tagging was not found, tags will be treated as plain text.'
 
 from util import EXIF
@@ -88,6 +90,8 @@ CROP_ANCHOR_CHOICES = (
     ('center', 'Center (Default)'),
 )
 
+class Test(models.Model):
+    test = TagField()
 
 class Gallery(models.Model):
     pub_date = models.DateTimeField("Date published", default=datetime.now)
