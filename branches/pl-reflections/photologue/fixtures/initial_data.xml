@@ -11,6 +11,7 @@
     </object>
     <object pk="1" model="photologue.photoeffect">
         <field type="CharField" name="name">Enhance Thumbnail</field>
+        <field type="TextField" name="description">A sample photo effect that increases the contrast and sharpness of the admin thumbnail images. Feel free to modify this effect.</field>
         <field type="FloatField" name="color">1.0</field>
         <field type="FloatField" name="brightness">1.0</field>
         <field type="FloatField" name="contrast">1.2</field>

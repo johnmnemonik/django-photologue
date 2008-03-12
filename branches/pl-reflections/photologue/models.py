@@ -46,6 +46,7 @@ except ImportError:
     tagfield_help_text = 'Django-tagging was not found, tags will be treated as plain text.'
 
 from util import EXIF
+from util.reflection import add_reflection
 
 # Path to sample image
 SAMPLE_IMAGE_PATH = getattr(settings, 'SAMPLE_IMAGE_PATH', os.path.join(os.path.dirname(__file__), 'res', 'sample.jpg')) # os.path.join(settings.PROJECT_PATH, 'photologue', 'res', 'sample.jpg'
@@ -414,14 +415,32 @@ class Photo(models.Model):
 class PhotoEffect(models.Model):
     """ A pre-defined effect to apply to photos """
     name = models.CharField(max_length=30, unique=True)
+    description = models.TextField(blank=True)
     color = models.FloatField(default=1.0, help_text="A factor of 0.0 gives a black and white image, a factor of 1.0 gives the original image.")
     brightness = models.FloatField(default=1.0, help_text="A factor of 0.0 gives a black image, a factor of 1.0 gives the original image.")
     contrast = models.FloatField(default=1.0, help_text="A factor of 0.0 gives a solid grey image, a factor of 1.0 gives the original image.")
     sharpness = models.FloatField(default=1.0, help_text="A factor of 0.0 gives a blurred image, a factor of 1.0 gives the original image.")
     filters = models.CharField(max_length=200, blank=True, help_text=image_filters_help_text)
+    reflection_size = models.FloatField('size', default=0, help_text="The height of the reflection as a percentage of the orignal image. A factor of 0.0 adds no reflection, a factor of 1.0 adds a reflection equal to the height of the orignal image.")
+    reflection_strength = models.FloatField('strength', default=0.6, help_text="The initial opacity of the reflection gradient.")
+    background_color = models.CharField('color', max_length=7, default="#FFFFFF", help_text="The background color of the reflection gradient. Set this to match the background color of your page.")
 
     class Admin:
-        list_display = ['name', 'color', 'brightness', 'contrast', 'sharpness', 'filters', 'admin_sample']
+        list_display = ['name', 'description', 'admin_sample']
+        fields = (
+            (None, {
+                'fields': ('name', 'description')
+            }),
+            ('Adjustments', {
+                'fields': ('color', 'brightness', 'contrast', 'sharpness')
+            }),
+            ('Filters', {
+                'fields': ('filters',)
+            }),
+            ('Reflection', {
+                'fields': ('reflection_size', 'reflection_strength', 'background_color')
+            }),
+        )
 
     def __unicode__(self):
         return self.name
@@ -464,6 +483,8 @@ class PhotoEffect(models.Model):
                     im = im.filter(image_filter)
                 except ValueError:
                     pass
+        if self.reflection_size != 0.0:
+            im = add_reflection(im, bgcolor=self.background_color, amount=self.reflection_size, opacity=self.reflection_strength)            
         return im
 
     def save(self):
