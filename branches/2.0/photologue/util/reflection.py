@@ -48,6 +48,9 @@ def add_reflection(im, bgcolor="#00000", amount=0.4, opacity=0.6):
     amount   The height of the reflection as a percentage of the orignal image
     opacity  The initial opacity of the reflection gradient
     
+    Originally written for the Photologue image management system for Django
+    and Based on the original concept by Bernd Schlapsi
+    
     """
     # convert bgcolor string to rgb value
     background_color = ImageColor.getrgb(bgcolor)
