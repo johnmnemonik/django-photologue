@@ -96,7 +96,14 @@ class Gallery(models.Model):
     description = models.TextField(_('description'), blank=True)
     is_public = models.BooleanField(_('is public'), default=True,
                                     help_text=_('Public galleries will be displayed in the default views.'))
-    photos = models.ManyToManyField("Photo", related_name='galleries', verbose_name=_('photos'))
+    pub_date = models.DateTimeField("Date published", default=datetime.now)
+    title = models.CharField(max_length=100, unique=True)
+    slug = models.SlugField(prepopulate_from=('title',), unique=True,
+                            help_text='A "Slug" is a unique URL-friendly title for an object.')
+    description = models.TextField(blank=True)
+    is_public = models.BooleanField(default=True,
+                                    help_text="Public galleries will be displayed in the default views.")
+    photos = models.ManyToManyField('Photo', related_name='galleries', verbose_name=_('photos'), filter_interface=models.HORIZONTAL)
     tags = TagField(help_text=tagfield_help_text, verbose_name=_('tags'))
 
     class Meta:
@@ -112,6 +119,9 @@ class Gallery(models.Model):
 
     def __unicode__(self):
         return self.title
+        
+    def __str__(self):
+        return self.__unicode__()
 
     def get_absolute_url(self):
         args = self.pub_date.strftime("%Y/%b/%d").lower().split("/") + [self.slug]
@@ -248,6 +258,9 @@ class Photo(models.Model):
 
     def __unicode__(self):
         return self.title
+        
+    def __str__(self):
+        return self.__unicode__()
 
     def get_absolute_url(self):
         args = self.pub_date.strftime("%Y/%b/%d").lower().split("/") + [self.slug]
@@ -395,14 +408,17 @@ class Photo(models.Model):
 
     def save(self):
         if self.date_taken is None:
-            exif_date = self.EXIF.get('EXIF DateTimeOriginal', None)
-            if exif_date is not None:
-                d, t = str.split(exif_date.values)
-                year, month, day = d.split(':')
-                hour, minute, second = t.split(':')
-                self.date_taken = datetime(int(year), int(month), int(day),
-                                           int(hour), int(minute), int(second))
-            else:
+            try:
+                exif_date = self.EXIF.get('EXIF DateTimeOriginal', None)
+                if exif_date is None:
+                    self.date_taken = datetime.now()
+                else:
+                    d, t = str.split(exif_date.values)
+                    year, month, day = d.split(':')
+                    hour, minute, second = t.split(':')
+                    self.date_taken = datetime(int(year), int(month), int(day),
+                                               int(hour), int(minute), int(second))
+            except:
                 self.date_taken = datetime.now()
         if self._get_pk_val():
             self.clear_cache()
@@ -436,6 +452,9 @@ class PhotoEffect(models.Model):
 
     def __unicode__(self):
         return self.name
+        
+    def __str__(self):
+        return self.__unicode__()
 
     def sample_dir(self):
         return os.path.join(settings.MEDIA_ROOT, PHOTOLOGUE_DIR, 'samples')
@@ -518,6 +537,9 @@ class PhotoSize(models.Model):
 
     def __unicode__(self):
         return self.name
+        
+    def __str__(self):
+        return self.__unicode__()
 
     def clear_cache(self):
         for photo in Photo.objects.all():
@@ -529,9 +551,9 @@ class PhotoSize(models.Model):
     def save(self):
         if self.width + self.height == 0:
             raise ValueError(_('A PhotoSize must have a positive height or width.'))
-        self.clear_cache()
         super(PhotoSize, self).save()
-
+        self.clear_cache()
+        
     def delete(self):
         self.clear_cache()
         super(PhotoSize, self).delete()
