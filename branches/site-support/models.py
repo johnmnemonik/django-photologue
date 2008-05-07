@@ -211,8 +211,9 @@ class GalleryUpload(models.Model):
                         continue
                     title = ' '.join([self.title_prefix, str(count)])
                     slug = slugify(title)
-                    photo = Photo(site=self.site
-                                  title=title, slug=slug,
+                    photo = Photo(site=self.site,
+                                  title=title,
+                                  slug=slug,
                                   caption=self.caption,
                                   photographer=self.photographer,
                                   info=self.info,
