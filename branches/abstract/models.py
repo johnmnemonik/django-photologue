@@ -367,7 +367,7 @@ class BasePhoto(models.Model):
             resized = self.effect.process(resized)
         elif photosize.effect is not None:
             resized = photosize.effect.process(resized)
-
+            
         # save resized file
         resized_filename = getattr(self, "get_%s_path" % photosize.name)()
         try:
@@ -409,7 +409,7 @@ class BasePhoto(models.Model):
 
     def save(self, update=False):
         if update:
-            super(Photo, self).save()
+            models.Model.save(self)
             return
         if self.date_taken is None:
             try:
@@ -460,10 +460,10 @@ class Photo(BasePhoto):
     def __str__(self):
         return self.__unicode__()
     
-    def save(self):
+    def save(self, update=False):
         if self.title_slug is None:
             self.title_slug = slugify(self.title)
-        super(Photo, self).save()
+        super(Photo, self).save(update)
 
     def get_absolute_url(self):
         return reverse('pl-photo', args=[self.title_slug])
