@@ -224,8 +224,7 @@ class GalleryUpload(models.Model):
 
 class BasePhoto(models.Model):
     image = models.ImageField(_('photograph'), upload_to=PHOTOLOGUE_DIR+"/photos")
-    date_taken = models.DateTimeField(_('date taken'), null=True, blank=True,
-                                      help_text=("If not provided, Photologue will attempt to determine the date taken from the image's EXIF data."))
+    date_taken = models.DateTimeField(_('date taken'), null=True, blank=True, editable=False)
     view_count = models.PositiveIntegerField(default=0, editable=False)
     crop_from = models.CharField(_('crop from'), blank=True, max_length=10, default='center', choices=CROP_ANCHOR_CHOICES)
     effect = models.ForeignKey('PhotoEffect', null=True, blank=True, related_name="%(class)s_related", verbose_name=_('effect'))
@@ -453,7 +452,7 @@ class Photo(BasePhoto):
 
     def __unicode__(self):
         return self.title
-        
+
     def __str__(self):
         return self.__unicode__()
     
@@ -550,13 +549,15 @@ class PhotoEffect(models.Model):
             os.remove(self.sample_filename())
         except:
             pass
-        for photo in self.photos.all():
-            photo.clear_cache()
-            photo.pre_cache()
-        for size in self.photo_sizes.all():
-            size.clear_cache()
         super(PhotoEffect, self).save()
         self.create_sample()
+        for size in self.photo_sizes.all():
+            size.clear_cache()
+        # try to clear all related subclasses of BasePhoto
+        for prop in [prop for prop in dir(self) if prop[-8:] == '_related']:
+            for obj in getattr(self, prop).all():
+                obj.clear_cache()
+                obj.pre_cache()
 
     def delete(self):
         try:
