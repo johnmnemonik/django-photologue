@@ -14,7 +14,7 @@ def precache(sizes=[], reset=False):
     setup_environ(settings)
 
     # import models
-    from photologue.models import Photo, PhotoSize, PhotoSizeCache
+    from photologue.models import Photo, PhotoSizeCache
 
     cache = PhotoSizeCache()
 
@@ -31,7 +31,7 @@ def precache(sizes=[], reset=False):
                         photo.remove_size(photosize)
                     photo.create_size(photosize)
         else:
-            for size in caches.sizes.values():
+            for size in cache.sizes.values():
                 if reset:
                     Photo.remove_size(photosize)
                 photo.create_size(photosize)
@@ -45,7 +45,7 @@ def reset():
     setup_environ(settings)
 
     # import models
-    from photologue.models import Photo, PhotoSize
+    from photologue.models import Photo
 
     print 'Reseting photo cache, this may take a while...'
 

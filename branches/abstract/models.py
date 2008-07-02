@@ -10,7 +10,6 @@ from django.db import models
 from django.db.models import signals
 from django.conf import settings
 from django.utils.functional import curry
-from django.core.validators import ValidationError
 from django.core.urlresolvers import reverse
 from django.dispatch import dispatcher
 from django.template.defaultfilters import slugify
@@ -583,7 +582,7 @@ class PhotoEffect(BaseEffect):
 
 class WaterMark(BaseEffect):
     image = models.ImageField(_('image'), upload_to=PHOTOLOGUE_DIR+"/photos")
-    position = models.CharField(_('position'), max_length=5, choices=(('tile', 'Tile'), ('scale', 'Scale')))
+    style = models.CharField(_('style'), max_length=5, choices=(('tile', 'Tile'), ('scale', 'Scale')))
     opacity = models.FloatField(_('opacity'), default=0.6, help_text=_("The opacity of the overlay."))
     
     class Meta:
@@ -591,11 +590,11 @@ class WaterMark(BaseEffect):
         verbose_name_plural = _('watermarks')
 
     class Admin:
-        list_display = ('name', 'opacity', 'position')
+        list_display = ('name', 'opacity', 'style')
         
     def process(self, im):
         mark = Image.open(self.get_image_filename())
-        return apply_watermark(im, mark, self.position, self.opacity)
+        return apply_watermark(im, mark, self.style, self.opacity)
     
 
 class PhotoSize(models.Model):
