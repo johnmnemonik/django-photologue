@@ -606,8 +606,7 @@ class PhotoSize(models.Model):
     pre_cache = models.BooleanField(_('pre-cache?'), default=False, help_text=_('If selected this photo size will be pre-cached as photos are added.'))
     effect = models.ForeignKey('PhotoEffect', null=True, blank=True, related_name='photo_sizes', verbose_name=_('effect'))
     watermark = models.ForeignKey('Watermark', null=True, blank=True, related_name='photo_sizes', verbose_name=_('watermark'))
-    increment_count = models.BooleanField(_('Increment count when viewed'), default=False)
-    
+    increment_count = models.BooleanField(_('Increment view count?'), default=False)
 
     class Meta:
         ordering = ['width', 'height']
@@ -615,7 +614,7 @@ class PhotoSize(models.Model):
         verbose_name_plural = _('photo sizes')
 
     class Admin:
-        list_display = ('name', 'width', 'height', 'crop', 'pre_cache', 'effect')
+        list_display = ('name', 'width', 'height', 'crop', 'pre_cache', 'effect', 'increment_count')
 
     def __unicode__(self):
         return self.name
