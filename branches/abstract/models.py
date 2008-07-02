@@ -228,7 +228,7 @@ class BasePhoto(models.Model):
                                       help_text=("If not provided, Photologue will attempt to determine the date taken from the image's EXIF data."))
     view_count = models.PositiveIntegerField(default=0, editable=False)
     crop_from = models.CharField(_('crop from'), blank=True, max_length=10, default='center', choices=CROP_ANCHOR_CHOICES)
-    effect = models.ForeignKey('PhotoEffect', null=True, blank=True, related_name='photos', verbose_name=_('effect'))
+    effect = models.ForeignKey('PhotoEffect', null=True, blank=True, related_name="%(class)s_related", verbose_name=_('effect'))
     
     class Meta:
         abstract = True
@@ -248,8 +248,11 @@ class BasePhoto(models.Model):
         if func is None:
             return _('An "admin_thumbnail" photo size has not been defined.')
         else:
-            return u'<a href="%s"><img src="%s"></a>' % \
-                (self.get_absolute_url(), func())
+            if hasattr(self, 'get_absolute_url'):
+                return u'<a href="%s"><img src="%s"></a>' % \
+                    (self.get_absolute_url(), func())
+            else:
+                return u'<img src="%s">' % func()
     admin_thumbnail.short_description = _('Thumbnail')
     admin_thumbnail.allow_tags = True
 
@@ -420,8 +423,6 @@ class BasePhoto(models.Model):
             self.date_taken = datetime.now()
         if self._get_pk_val():
             self.clear_cache()
-        if self.title_slug is None:
-            self.title_slug = slugify(self.title)
         super(BasePhoto, self).save()
         self.pre_cache()
 
@@ -455,6 +456,11 @@ class Photo(BasePhoto):
         
     def __str__(self):
         return self.__unicode__()
+    
+    def save(self):
+        if self.title_slug is None:
+            self.title_slug = slugify(self.title)
+        super(Photo, self).save()
 
     def get_absolute_url(self):
         return reverse('pl-photo', args=[self.title_slug])
