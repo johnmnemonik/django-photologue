@@ -10,7 +10,6 @@ from django.db import models
 from django.db.models import signals
 from django.conf import settings
 from django.utils.functional import curry
-from django.core.validators import ValidationError
 from django.core.urlresolvers import reverse
 from django.dispatch import dispatcher
 from django.template.defaultfilters import slugify
@@ -49,6 +48,7 @@ except ImportError:
 
 from utils import EXIF
 from utils.reflection import add_reflection
+from utils.watermark import apply_watermark
 
 
 # Path to sample image
@@ -222,31 +222,15 @@ class GalleryUpload(models.Model):
                 pass
 
 
-class Photo(models.Model):
+class BasePhoto(models.Model):
     image = models.ImageField(_('photograph'), upload_to=PHOTOLOGUE_DIR+"/photos")
-    title = models.CharField(_('title'), max_length=100, unique=True)
-    title_slug = models.SlugField(_('slug'), prepopulate_from=('title',), unique=True,
-                                  help_text=('A "slug" is a unique URL-friendly title for an object.'))
-    caption = models.TextField(_('caption'), blank=True)
-    date_added = models.DateTimeField(_('date added'), default=datetime.now, editable=False)
-    date_taken = models.DateTimeField(_('date taken'), null=True, blank=True,
-                                      help_text=("If not provided, Photologue will attempt to determine the date taken from the image's EXIF data."))
+    date_taken = models.DateTimeField(_('date taken'), null=True, blank=True, editable=False)
     view_count = models.PositiveIntegerField(default=0, editable=False)
     crop_from = models.CharField(_('crop from'), blank=True, max_length=10, default='center', choices=CROP_ANCHOR_CHOICES)
-    is_public = models.BooleanField(_('is public'), default=True, help_text=_('Public photographs will be displayed in the default views.'))
-    tags = TagField(help_text=tagfield_help_text, verbose_name=_('tags'))
-    effect = models.ForeignKey('PhotoEffect', null=True, blank=True, related_name='photos', verbose_name=_('effect'))
-
+    effect = models.ForeignKey('PhotoEffect', null=True, blank=True, related_name="%(class)s_related", verbose_name=_('effect'))
+    
     class Meta:
-        ordering = ['-date_added']
-        get_latest_by = 'date_added'
-        verbose_name = _("photo")
-        verbose_name_plural = _("photos")
-
-    class Admin:
-        list_display = ('title', 'date_taken', 'date_added', 'is_public', 'tags', 'view_count', 'admin_thumbnail')
-        list_filter = ['date_added', 'is_public']
-        list_per_page = 10
+        abstract = True
 
     @property
     def EXIF(self):
@@ -263,19 +247,13 @@ class Photo(models.Model):
         if func is None:
             return _('An "admin_thumbnail" photo size has not been defined.')
         else:
-            return u'<a href="%s"><img src="%s"></a>' % \
-                (self.get_absolute_url(), func())
+            if hasattr(self, 'get_absolute_url'):
+                return u'<a href="%s"><img src="%s"></a>' % \
+                    (self.get_absolute_url(), func())
+            else:
+                return u'<img src="%s">' % func()
     admin_thumbnail.short_description = _('Thumbnail')
     admin_thumbnail.allow_tags = True
-
-    def __unicode__(self):
-        return self.title
-        
-    def __str__(self):
-        return self.__unicode__()
-
-    def get_absolute_url(self):
-        return reverse('pl-photo', args=[self.title_slug])
 
     def cache_path(self):
         return os.path.join(os.path.dirname(self.get_image_filename()), "cache")
@@ -299,7 +277,7 @@ class Photo(models.Model):
     def _get_SIZE_url(self, photosize):
         if not self.size_exists(photosize):
             self.create_size(photosize)
-        if not photosize.name == 'admin_thumbnail':
+        if photosize.increment_count:
             self.view_count += 1
             self.save(update=True)
         return '/'.join([self.cache_url(), self._get_filename_for_size(photosize.name)])
@@ -379,13 +357,17 @@ class Photo(models.Model):
                 else:
                     ratio = float(new_width)/cur_width
             resized = im.resize((int(cur_width*ratio), int(cur_height*ratio)), Image.ANTIALIAS)
-
+        
+        # Apply watermark if found
+        if photosize.watermark is not None:
+            resized = photosize.watermark.process(resized)
+            
         # Apply effect if found
         if self.effect is not None:
             resized = self.effect.process(resized)
         elif photosize.effect is not None:
             resized = photosize.effect.process(resized)
-
+            
         # save resized file
         resized_filename = getattr(self, "get_%s_path" % photosize.name)()
         try:
@@ -427,7 +409,7 @@ class Photo(models.Model):
 
     def save(self, update=False):
         if update:
-            super(Photo, self).save()
+            models.Model.save(self)
             return
         if self.date_taken is None:
             try:
@@ -444,53 +426,60 @@ class Photo(models.Model):
             self.date_taken = datetime.now()
         if self._get_pk_val():
             self.clear_cache()
-        if self.title_slug is None:
-            self.title_slug = slugify(self.title)
-        super(Photo, self).save()
+        super(BasePhoto, self).save()
         self.pre_cache()
 
     def delete(self):
-        super(Photo, self).delete()
+        super(BasePhoto, self).delete()
         self.clear_cache()
+
+
+class Photo(BasePhoto):
+    title = models.CharField(_('title'), max_length=100, unique=True)
+    title_slug = models.SlugField(_('slug'), prepopulate_from=('title',), unique=True,
+                                  help_text=('A "slug" is a unique URL-friendly title for an object.'))
+    caption = models.TextField(_('caption'), blank=True)
+    date_added = models.DateTimeField(_('date added'), default=datetime.now, editable=False)
+    is_public = models.BooleanField(_('is public'), default=True, help_text=_('Public photographs will be displayed in the default views.'))
+    tags = TagField(help_text=tagfield_help_text, verbose_name=_('tags'))
+
+    class Meta:
+        ordering = ['-date_added']
+        get_latest_by = 'date_added'
+        verbose_name = _("photo")
+        verbose_name_plural = _("photos")
+
+    class Admin:
+        list_display = ('title', 'date_taken', 'date_added', 'is_public', 'tags', 'view_count', 'admin_thumbnail')
+        list_filter = ['date_added', 'is_public']
+        list_per_page = 10
+
+    def __unicode__(self):
+        return self.title
+
+    def __str__(self):
+        return self.__unicode__()
+    
+    def save(self, update=False):
+        if self.title_slug is None:
+            self.title_slug = slugify(self.title)
+        super(Photo, self).save(update)
+
+    def get_absolute_url(self):
+        return reverse('pl-photo', args=[self.title_slug])
 
     def public_galleries(self):
         """Return the public galleries to which this photo belongs."""
         return self.galleries.filter(is_public=True)
 
 
-class PhotoEffect(models.Model):
-    """ A pre-defined effect to apply to photos """
-    name = models.CharField(max_length=30, unique=True)
-    description = models.TextField(blank=True)
-    color = models.FloatField(default=1.0, help_text="A factor of 0.0 gives a black and white image, a factor of 1.0 gives the original image.")
-    brightness = models.FloatField(default=1.0, help_text="A factor of 0.0 gives a black image, a factor of 1.0 gives the original image.")
-    contrast = models.FloatField(default=1.0, help_text="A factor of 0.0 gives a solid grey image, a factor of 1.0 gives the original image.")
-    sharpness = models.FloatField(default=1.0, help_text="A factor of 0.0 gives a blurred image, a factor of 1.0 gives the original image.")
-    filters = models.CharField(max_length=200, blank=True, help_text=image_filters_help_text)
-    reflection_size = models.FloatField('size', default=0, help_text="The height of the reflection as a percentage of the orignal image. A factor of 0.0 adds no reflection, a factor of 1.0 adds a reflection equal to the height of the orignal image.")
-    reflection_strength = models.FloatField('strength', default=0.6, help_text="The initial opacity of the reflection gradient.")
-    background_color = models.CharField('color', max_length=7, default="#FFFFFF", help_text="The background color of the reflection gradient. Set this to match the background color of your page.")
-
-    class Admin:
-        list_display = ['name', 'description', 'admin_sample']
-        fields = (
-            (None, {
-                'fields': ('name', 'description')
-            }),
-            ('Adjustments', {
-                'fields': ('color', 'brightness', 'contrast', 'sharpness')
-            }),
-            ('Filters', {
-                'fields': ('filters',)
-            }),
-            ('Reflection', {
-                'fields': ('reflection_size', 'reflection_strength', 'background_color')
-            }),
-        )
-
-    def __unicode__(self):
-        return self.name
-
+class BaseEffect(models.Model):
+    name = models.CharField(_('name'), max_length=30, unique=True)
+    description = models.TextField(_('description'), blank=True)
+    
+    class Meta:
+        abstract = True
+        
     def sample_dir(self):
         return os.path.join(settings.MEDIA_ROOT, PHOTOLOGUE_DIR, 'samples')
 
@@ -514,9 +503,66 @@ class PhotoEffect(models.Model):
         return u'<img src="%s">' % self.sample_url()
     admin_sample.short_description = 'Sample'
     admin_sample.allow_tags = True
+    
+    def __unicode__(self):
+        return self.name
+        
+    def __str__(self):
+        return self.__unicode__()
+
+    def save(self):
+        try:
+            os.remove(self.sample_filename())
+        except:
+            pass
+        models.Model.save(self)
+        self.create_sample()
+        for size in self.photo_sizes.all():
+            size.clear_cache()
+        # try to clear all related subclasses of BasePhoto
+        for prop in [prop for prop in dir(self) if prop[-8:] == '_related']:
+            for obj in getattr(self, prop).all():
+                obj.clear_cache()
+                obj.pre_cache()
+
+    def delete(self):
+        try:
+            os.remove(self.sample_filename())
+        except:
+            pass
+        super(PhotoEffect, self).delete()
+    
+
+class PhotoEffect(BaseEffect):
+    """ A pre-defined effect to apply to photos """
+    color = models.FloatField(_('color'), default=1.0, help_text=_("A factor of 0.0 gives a black and white image, a factor of 1.0 gives the original image."))
+    brightness = models.FloatField(_('brightness'), default=1.0, help_text=_("A factor of 0.0 gives a black image, a factor of 1.0 gives the original image."))
+    contrast = models.FloatField(_('contrast'), default=1.0, help_text=_("A factor of 0.0 gives a solid grey image, a factor of 1.0 gives the original image."))
+    sharpness = models.FloatField(_('sharpness'), default=1.0, help_text=_("A factor of 0.0 gives a blurred image, a factor of 1.0 gives the original image."))
+    filters = models.CharField(_('filters'), max_length=200, blank=True, help_text=_(image_filters_help_text))
+    reflection_size = models.FloatField(_('size'), default=0, help_text=_("The height of the reflection as a percentage of the orignal image. A factor of 0.0 adds no reflection, a factor of 1.0 adds a reflection equal to the height of the orignal image."))
+    reflection_strength = models.FloatField(_('strength'), default=0.6, help_text="The initial opacity of the reflection gradient.")
+    background_color = models.CharField(_('color'), max_length=7, default="#FFFFFF", help_text="The background color of the reflection gradient. Set this to match the background color of your page.")
+
+    class Admin:
+        list_display = ['name', 'description', 'admin_sample']
+        fields = (
+            (None, {
+                'fields': ('name', 'description')
+            }),
+            ('Adjustments', {
+                'fields': ('color', 'brightness', 'contrast', 'sharpness')
+            }),
+            ('Filters', {
+                'fields': ('filters',)
+            }),
+            ('Reflection', {
+                'fields': ('reflection_size', 'reflection_strength', 'background_color')
+            }),
+        )
 
     def process(self, im):
-        if im.mode != 'RGB':
+        if im.mode != 'RGB' and im.mode != 'RGBA':
             return im
         for name in ['Color', 'Brightness', 'Contrast', 'Sharpness']:
             factor = getattr(self, name.lower())
@@ -533,26 +579,23 @@ class PhotoEffect(models.Model):
             im = add_reflection(im, bgcolor=self.background_color, amount=self.reflection_size, opacity=self.reflection_strength)            
         return im
 
-    def save(self):
-        try:
-            os.remove(self.sample_filename())
-        except:
-            pass
-        for photo in self.photos.all():
-            photo.clear_cache()
-            photo.pre_cache()
-        for size in self.photo_sizes.all():
-            size.clear_cache()
-        super(PhotoEffect, self).save()
-        self.create_sample()
 
-    def delete(self):
-        try:
-            os.remove(self.sample_filename())
-        except:
-            pass
-        super(PhotoEffect, self).delete()
+class WaterMark(BaseEffect):
+    image = models.ImageField(_('image'), upload_to=PHOTOLOGUE_DIR+"/photos")
+    style = models.CharField(_('style'), max_length=5, choices=(('tile', 'Tile'), ('scale', 'Scale')))
+    opacity = models.FloatField(_('opacity'), default=0.6, help_text=_("The opacity of the overlay."))
+    
+    class Meta:
+        verbose_name = _('watermark')
+        verbose_name_plural = _('watermarks')
 
+    class Admin:
+        list_display = ('name', 'opacity', 'style')
+        
+    def process(self, im):
+        mark = Image.open(self.get_image_filename())
+        return apply_watermark(im, mark, self.style, self.opacity)
+    
 
 class PhotoSize(models.Model):
     name = models.CharField(_('name'), max_length=20, unique=True, help_text=_('Photo size name should contain only letters, numbers and underscores. Examples: "thumbnail", "display", "small", "main_page_widget".'))
@@ -562,6 +605,8 @@ class PhotoSize(models.Model):
     crop = models.BooleanField(_('crop to fit?'), default=False, help_text=_('If selected the image will be scaled and cropped to fit the supplied dimensions.'))
     pre_cache = models.BooleanField(_('pre-cache?'), default=False, help_text=_('If selected this photo size will be pre-cached as photos are added.'))
     effect = models.ForeignKey('PhotoEffect', null=True, blank=True, related_name='photo_sizes', verbose_name=_('effect'))
+    watermark = models.ForeignKey('Watermark', null=True, blank=True, related_name='photo_sizes', verbose_name=_('watermark'))
+    increment_count = models.BooleanField(_('Increment view count?'), default=False)
 
     class Meta:
         ordering = ['width', 'height']
@@ -569,7 +614,7 @@ class PhotoSize(models.Model):
         verbose_name_plural = _('photo sizes')
 
     class Admin:
-        list_display = ('name', 'width', 'height', 'crop', 'pre_cache', 'effect')
+        list_display = ('name', 'width', 'height', 'crop', 'pre_cache', 'effect', 'increment_count')
 
     def __unicode__(self):
         return self.name
@@ -616,7 +661,8 @@ def add_methods(sender, instance, signal, *args, **kwargs):
     after the photo models __init__ function completes,
     this method calls "add_accessor_methods" on each instance.
     """
-    instance.add_accessor_methods()
+    if hasattr(instance, 'add_accessor_methods'):
+        instance.add_accessor_methods()
 
 # connect the add_accessor_methods function to the post_init signal
-dispatcher.connect(add_methods, signal=signals.post_init, sender=Photo)
+dispatcher.connect(add_methods, signal=signals.post_init)
