@@ -49,6 +49,7 @@ except ImportError:
 
 from utils import EXIF
 from utils.reflection import add_reflection
+from utils.watermark import apply_watermark
 
 
 # Path to sample image
@@ -357,7 +358,11 @@ class BasePhoto(models.Model):
                 else:
                     ratio = float(new_width)/cur_width
             resized = im.resize((int(cur_width*ratio), int(cur_height*ratio)), Image.ANTIALIAS)
-
+        
+        # Apply watermark if found
+        if photosize.watermark is not None:
+            resized = photosize.watermark.process(resized)
+            
         # Apply effect if found
         if self.effect is not None:
             resized = self.effect.process(resized)
@@ -469,39 +474,13 @@ class Photo(BasePhoto):
         return self.galleries.filter(is_public=True)
 
 
-class PhotoEffect(models.Model):
-    """ A pre-defined effect to apply to photos """
-    name = models.CharField(max_length=30, unique=True)
-    description = models.TextField(blank=True)
-    color = models.FloatField(default=1.0, help_text="A factor of 0.0 gives a black and white image, a factor of 1.0 gives the original image.")
-    brightness = models.FloatField(default=1.0, help_text="A factor of 0.0 gives a black image, a factor of 1.0 gives the original image.")
-    contrast = models.FloatField(default=1.0, help_text="A factor of 0.0 gives a solid grey image, a factor of 1.0 gives the original image.")
-    sharpness = models.FloatField(default=1.0, help_text="A factor of 0.0 gives a blurred image, a factor of 1.0 gives the original image.")
-    filters = models.CharField(max_length=200, blank=True, help_text=image_filters_help_text)
-    reflection_size = models.FloatField('size', default=0, help_text="The height of the reflection as a percentage of the orignal image. A factor of 0.0 adds no reflection, a factor of 1.0 adds a reflection equal to the height of the orignal image.")
-    reflection_strength = models.FloatField('strength', default=0.6, help_text="The initial opacity of the reflection gradient.")
-    background_color = models.CharField('color', max_length=7, default="#FFFFFF", help_text="The background color of the reflection gradient. Set this to match the background color of your page.")
-
-    class Admin:
-        list_display = ['name', 'description', 'admin_sample']
-        fields = (
-            (None, {
-                'fields': ('name', 'description')
-            }),
-            ('Adjustments', {
-                'fields': ('color', 'brightness', 'contrast', 'sharpness')
-            }),
-            ('Filters', {
-                'fields': ('filters',)
-            }),
-            ('Reflection', {
-                'fields': ('reflection_size', 'reflection_strength', 'background_color')
-            }),
-        )
-
-    def __unicode__(self):
-        return self.name
-
+class BaseEffect(models.Model):
+    name = models.CharField(_('name'), max_length=30, unique=True)
+    description = models.TextField(_('description'), blank=True)
+    
+    class Meta:
+        abstract = True
+        
     def sample_dir(self):
         return os.path.join(settings.MEDIA_ROOT, PHOTOLOGUE_DIR, 'samples')
 
@@ -525,9 +504,66 @@ class PhotoEffect(models.Model):
         return u'<img src="%s">' % self.sample_url()
     admin_sample.short_description = 'Sample'
     admin_sample.allow_tags = True
+    
+    def __unicode__(self):
+        return self.name
+        
+    def __str__(self):
+        return self.__unicode__()
+
+    def save(self):
+        try:
+            os.remove(self.sample_filename())
+        except:
+            pass
+        models.Model.save(self)
+        self.create_sample()
+        for size in self.photo_sizes.all():
+            size.clear_cache()
+        # try to clear all related subclasses of BasePhoto
+        for prop in [prop for prop in dir(self) if prop[-8:] == '_related']:
+            for obj in getattr(self, prop).all():
+                obj.clear_cache()
+                obj.pre_cache()
+
+    def delete(self):
+        try:
+            os.remove(self.sample_filename())
+        except:
+            pass
+        super(PhotoEffect, self).delete()
+    
+
+class PhotoEffect(BaseEffect):
+    """ A pre-defined effect to apply to photos """
+    color = models.FloatField(_('color'), default=1.0, help_text=_("A factor of 0.0 gives a black and white image, a factor of 1.0 gives the original image."))
+    brightness = models.FloatField(_('brightness'), default=1.0, help_text=_("A factor of 0.0 gives a black image, a factor of 1.0 gives the original image."))
+    contrast = models.FloatField(_('contrast'), default=1.0, help_text=_("A factor of 0.0 gives a solid grey image, a factor of 1.0 gives the original image."))
+    sharpness = models.FloatField(_('sharpness'), default=1.0, help_text=_("A factor of 0.0 gives a blurred image, a factor of 1.0 gives the original image."))
+    filters = models.CharField(_('filters'), max_length=200, blank=True, help_text=_(image_filters_help_text))
+    reflection_size = models.FloatField(_('size'), default=0, help_text=_("The height of the reflection as a percentage of the orignal image. A factor of 0.0 adds no reflection, a factor of 1.0 adds a reflection equal to the height of the orignal image."))
+    reflection_strength = models.FloatField(_('strength'), default=0.6, help_text="The initial opacity of the reflection gradient.")
+    background_color = models.CharField(_('color'), max_length=7, default="#FFFFFF", help_text="The background color of the reflection gradient. Set this to match the background color of your page.")
+
+    class Admin:
+        list_display = ['name', 'description', 'admin_sample']
+        fields = (
+            (None, {
+                'fields': ('name', 'description')
+            }),
+            ('Adjustments', {
+                'fields': ('color', 'brightness', 'contrast', 'sharpness')
+            }),
+            ('Filters', {
+                'fields': ('filters',)
+            }),
+            ('Reflection', {
+                'fields': ('reflection_size', 'reflection_strength', 'background_color')
+            }),
+        )
 
     def process(self, im):
-        if im.mode != 'RGB':
+        if im.mode != 'RGB' and im.mode != 'RGBA':
             return im
         for name in ['Color', 'Brightness', 'Contrast', 'Sharpness']:
             factor = getattr(self, name.lower())
@@ -544,28 +580,23 @@ class PhotoEffect(models.Model):
             im = add_reflection(im, bgcolor=self.background_color, amount=self.reflection_size, opacity=self.reflection_strength)            
         return im
 
-    def save(self):
-        try:
-            os.remove(self.sample_filename())
-        except:
-            pass
-        super(PhotoEffect, self).save()
-        self.create_sample()
-        for size in self.photo_sizes.all():
-            size.clear_cache()
-        # try to clear all related subclasses of BasePhoto
-        for prop in [prop for prop in dir(self) if prop[-8:] == '_related']:
-            for obj in getattr(self, prop).all():
-                obj.clear_cache()
-                obj.pre_cache()
 
-    def delete(self):
-        try:
-            os.remove(self.sample_filename())
-        except:
-            pass
-        super(PhotoEffect, self).delete()
+class WaterMark(BaseEffect):
+    image = models.ImageField(_('image'), upload_to=PHOTOLOGUE_DIR+"/photos")
+    position = models.CharField(_('position'), max_length=5, choices=(('tile', 'Tile'), ('scale', 'Scale')))
+    opacity = models.FloatField(_('opacity'), default=0.6, help_text=_("The opacity of the overlay."))
+    
+    class Meta:
+        verbose_name = _('watermark')
+        verbose_name_plural = _('watermarks')
 
+    class Admin:
+        list_display = ('name', 'opacity', 'position')
+        
+    def process(self, im):
+        mark = Image.open(self.get_image_filename())
+        return apply_watermark(im, mark, self.position, self.opacity)
+    
 
 class PhotoSize(models.Model):
     name = models.CharField(_('name'), max_length=20, unique=True, help_text=_('Photo size name should contain only letters, numbers and underscores. Examples: "thumbnail", "display", "small", "main_page_widget".'))
@@ -575,6 +606,8 @@ class PhotoSize(models.Model):
     crop = models.BooleanField(_('crop to fit?'), default=False, help_text=_('If selected the image will be scaled and cropped to fit the supplied dimensions.'))
     pre_cache = models.BooleanField(_('pre-cache?'), default=False, help_text=_('If selected this photo size will be pre-cached as photos are added.'))
     effect = models.ForeignKey('PhotoEffect', null=True, blank=True, related_name='photo_sizes', verbose_name=_('effect'))
+    watermark = models.ForeignKey('Watermark', null=True, blank=True, related_name='photo_sizes', verbose_name=_('watermark'))
+    
 
     class Meta:
         ordering = ['width', 'height']
