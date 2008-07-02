@@ -623,10 +623,11 @@ class PhotoSize(models.Model):
         return self.__unicode__()
 
     def clear_cache(self):
-        for photo in Photo.objects.all():
-            photo.remove_size(self)
-            if self.pre_cache:
-                photo.create_size(self)
+        for cls in BasePhoto.__subclasses__():
+            for obj in cls.objects.all():
+                obj.remove_size(self)
+                if self.pre_cache:
+                    obj.create_size(self)
         PhotoSizeCache().reset()
 
     def save(self):
