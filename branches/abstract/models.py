@@ -277,7 +277,7 @@ class BasePhoto(models.Model):
     def _get_SIZE_url(self, photosize):
         if not self.size_exists(photosize):
             self.create_size(photosize)
-        if not photosize.name == 'admin_thumbnail':
+        if photosize.increment_count:
             self.view_count += 1
             self.save(update=True)
         return '/'.join([self.cache_url(), self._get_filename_for_size(photosize.name)])
@@ -606,6 +606,7 @@ class PhotoSize(models.Model):
     pre_cache = models.BooleanField(_('pre-cache?'), default=False, help_text=_('If selected this photo size will be pre-cached as photos are added.'))
     effect = models.ForeignKey('PhotoEffect', null=True, blank=True, related_name='photo_sizes', verbose_name=_('effect'))
     watermark = models.ForeignKey('Watermark', null=True, blank=True, related_name='photo_sizes', verbose_name=_('watermark'))
+    increment_count = models.BooleanField(_('Increment count when viewed'), default=False)
     
 
     class Meta:
