@@ -222,7 +222,7 @@ class GalleryUpload(models.Model):
                 pass
 
 
-class BasePhoto(models.Model):
+class ImageModel(models.Model):
     image = models.ImageField(_('photograph'), upload_to=PHOTOLOGUE_DIR+"/photos")
     date_taken = models.DateTimeField(_('date taken'), null=True, blank=True, editable=False)
     view_count = models.PositiveIntegerField(default=0, editable=False)
@@ -251,7 +251,8 @@ class BasePhoto(models.Model):
                 return u'<a href="%s"><img src="%s"></a>' % \
                     (self.get_absolute_url(), func())
             else:
-                return u'<img src="%s">' % func()
+                return u'<a href="%s"><img src="%s"></a>' % \
+                    (self.get_image_url(), func())
     admin_thumbnail.short_description = _('Thumbnail')
     admin_thumbnail.allow_tags = True
 
@@ -426,15 +427,15 @@ class BasePhoto(models.Model):
             self.date_taken = datetime.now()
         if self._get_pk_val():
             self.clear_cache()
-        super(BasePhoto, self).save()
+        super(ImageModel, self).save()
         self.pre_cache()
 
     def delete(self):
-        super(BasePhoto, self).delete()
+        super(ImageModel, self).delete()
         self.clear_cache()
 
 
-class Photo(BasePhoto):
+class Photo(ImageModel):
     title = models.CharField(_('title'), max_length=100, unique=True)
     title_slug = models.SlugField(_('slug'), prepopulate_from=('title',), unique=True,
                                   help_text=('A "slug" is a unique URL-friendly title for an object.'))
@@ -519,7 +520,7 @@ class BaseEffect(models.Model):
         self.create_sample()
         for size in self.photo_sizes.all():
             size.clear_cache()
-        # try to clear all related subclasses of BasePhoto
+        # try to clear all related subclasses of ImageModel
         for prop in [prop for prop in dir(self) if prop[-8:] == '_related']:
             for obj in getattr(self, prop).all():
                 obj.clear_cache()
@@ -582,8 +583,8 @@ class PhotoEffect(BaseEffect):
 
 class WaterMark(BaseEffect):
     image = models.ImageField(_('image'), upload_to=PHOTOLOGUE_DIR+"/photos")
-    style = models.CharField(_('style'), max_length=5, choices=(('tile', 'Tile'), ('scale', 'Scale')))
-    opacity = models.FloatField(_('opacity'), default=0.6, help_text=_("The opacity of the overlay."))
+    style = models.CharField(_('style'), max_length=5, choices=(('tile', _('Tile')), ('scale', _('Scale'))), default='scale')
+    opacity = models.FloatField(_('opacity'), default=1, help_text=_("The opacity of the overlay."))
     
     class Meta:
         verbose_name = _('watermark')
@@ -623,7 +624,7 @@ class PhotoSize(models.Model):
         return self.__unicode__()
 
     def clear_cache(self):
-        for cls in BasePhoto.__subclasses__():
+        for cls in ImageModel.__subclasses__():
             for obj in cls.objects.all():
                 obj.remove_size(self)
                 if self.pre_cache:
