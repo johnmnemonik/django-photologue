@@ -50,7 +50,6 @@ from utils import EXIF
 from utils.reflection import add_reflection
 from utils.watermark import apply_watermark
 
-
 # Path to sample image
 SAMPLE_IMAGE_PATH = getattr(settings, 'SAMPLE_IMAGE_PATH', os.path.join(os.path.dirname(__file__), 'res', 'sample.jpg')) # os.path.join(settings.PROJECT_PATH, 'photologue', 'res', 'sample.jpg'
 
@@ -59,16 +58,6 @@ PHOTOLOGUE_DIR = getattr(settings, 'PHOTOLOGUE_DIR', 'photologue')
 
 # Modify image file buffer size.
 ImageFile.MAXBLOCK = getattr(settings, 'PHOTOLOGUE_MAXBLOCK', 256*1024)
-
-# Prepare a list of image filters
-filter_names = []
-for n in dir(ImageFilter):
-    klass = getattr(ImageFilter, n)
-    if isclass(klass) and issubclass(klass, ImageFilter.BuiltinFilter) and \
-        hasattr(klass, 'name'):
-            filter_names.append(klass.__name__)
-image_filters_help_text = _('Chain multiple filters using the following pattern "FILTER_ONE->FILTER_TWO->FILTER_THREE". Image filters will be applied in order. The following filter are available: %s') % \
-                          ', '.join(filter_names)
 
 # Quality options for JPEG images
 JPEG_QUALITY_CHOICES = (
@@ -89,6 +78,21 @@ CROP_ANCHOR_CHOICES = (
     ('left', _('Left')),
     ('center', _('Center (Default)')),
 )
+
+WATERMARK_STYLE_CHOICES = (
+    ('tile', _('Tile')),
+    ('scale', _('Scale')),
+)
+
+# Prepare a list of image filters
+filter_names = []
+for n in dir(ImageFilter):
+    klass = getattr(ImageFilter, n)
+    if isclass(klass) and issubclass(klass, ImageFilter.BuiltinFilter) and \
+        hasattr(klass, 'name'):
+            filter_names.append(klass.__name__)
+IMAGE_FILTERS_HELP_TEXT = _('Chain multiple filters using the following pattern "FILTER_ONE->FILTER_TWO->FILTER_THREE". Image filters will be applied in order. The following filter are available: %s.') % \
+                          ', '.join(filter_names)
 
 
 class Gallery(models.Model):
@@ -540,7 +544,7 @@ class PhotoEffect(BaseEffect):
     brightness = models.FloatField(_('brightness'), default=1.0, help_text=_("A factor of 0.0 gives a black image, a factor of 1.0 gives the original image."))
     contrast = models.FloatField(_('contrast'), default=1.0, help_text=_("A factor of 0.0 gives a solid grey image, a factor of 1.0 gives the original image."))
     sharpness = models.FloatField(_('sharpness'), default=1.0, help_text=_("A factor of 0.0 gives a blurred image, a factor of 1.0 gives the original image."))
-    filters = models.CharField(_('filters'), max_length=200, blank=True, help_text=_(image_filters_help_text))
+    filters = models.CharField(_('filters'), max_length=200, blank=True, help_text=_(IMAGE_FILTERS_HELP_TEXT))
     reflection_size = models.FloatField(_('size'), default=0, help_text=_("The height of the reflection as a percentage of the orignal image. A factor of 0.0 adds no reflection, a factor of 1.0 adds a reflection equal to the height of the orignal image."))
     reflection_strength = models.FloatField(_('strength'), default=0.6, help_text="The initial opacity of the reflection gradient.")
     background_color = models.CharField(_('color'), max_length=7, default="#FFFFFF", help_text="The background color of the reflection gradient. Set this to match the background color of your page.")
@@ -583,7 +587,7 @@ class PhotoEffect(BaseEffect):
 
 class WaterMark(BaseEffect):
     image = models.ImageField(_('image'), upload_to=PHOTOLOGUE_DIR+"/watermarks")
-    style = models.CharField(_('style'), max_length=5, choices=(('tile', _('Tile')), ('scale', _('Scale'))), default='scale')
+    style = models.CharField(_('style'), max_length=5, choices=WATERMARK_STYLE_CHOICES, default='scale')
     opacity = models.FloatField(_('opacity'), default=1, help_text=_("The opacity of the overlay."))
     
     class Meta:
@@ -605,9 +609,9 @@ class PhotoSize(models.Model):
     quality = models.PositiveIntegerField(_('quality'), choices=JPEG_QUALITY_CHOICES, default=70, help_text=_('JPEG image quality.'))
     crop = models.BooleanField(_('crop to fit?'), default=False, help_text=_('If selected the image will be scaled and cropped to fit the supplied dimensions.'))
     pre_cache = models.BooleanField(_('pre-cache?'), default=False, help_text=_('If selected this photo size will be pre-cached as photos are added.'))
-    effect = models.ForeignKey('PhotoEffect', null=True, blank=True, related_name='photo_sizes', verbose_name=_('effect'))
-    watermark = models.ForeignKey('Watermark', null=True, blank=True, related_name='photo_sizes', verbose_name=_('watermark'))
-    increment_count = models.BooleanField(_('Increment view count?'), default=False)
+    increment_count = models.BooleanField(_('Increment view count?'), default=False, help_text=_('If selected the image\'s "view_count" will be incremented when this photo size is displayed.'))
+    effect = models.ForeignKey('PhotoEffect', null=True, blank=True, related_name='photo_sizes', verbose_name=_('photo effect'))
+    watermark = models.ForeignKey('Watermark', null=True, blank=True, related_name='photo_sizes', verbose_name=_('watermark image'))
 
     class Meta:
         ordering = ['width', 'height']
@@ -616,6 +620,17 @@ class PhotoSize(models.Model):
 
     class Admin:
         list_display = ('name', 'width', 'height', 'crop', 'pre_cache', 'effect', 'increment_count')
+        fields = (
+            (None, {
+                'fields': ('name', 'width', 'height', 'quality')
+            }),
+            ('Options', {
+                'fields': ('crop', 'pre_cache', 'increment_count')
+            }),
+            ('Enhancements', {
+                'fields': ('effect', 'watermark',)
+            }),
+        )
 
     def __unicode__(self):
         return self.name

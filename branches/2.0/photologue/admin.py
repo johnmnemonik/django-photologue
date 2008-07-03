@@ -39,6 +39,17 @@ class PhotoEffectAdmin(admin.ModelAdmin):
     
 class PhotoSizeAdmin(admin.ModelAdmin):
     list_display = ('name', 'width', 'height', 'crop', 'pre_cache', 'effect', 'increment_count')
+    fieldsets = (
+        (None, {
+            'fields': ('name', 'width', 'height', 'quality')
+        }),
+        ('Options', {
+            'fields': ('crop', 'pre_cache', 'increment_count')
+        }),
+        ('Enhancements', {
+            'fields': ('effect', 'watermark',)
+        }),
+    )
 
     
 class WatermarkAdmin(admin.ModelAdmin):
