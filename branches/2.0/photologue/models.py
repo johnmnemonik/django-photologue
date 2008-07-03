@@ -82,8 +82,8 @@ CROP_ANCHOR_CHOICES = (
 IMAGE_TRANSPOSE_CHOICES = (
     ('FLIP_LEFT_RIGHT', _('Flip left to right')),
     ('FLIP_TOP_BOTTOM', _('Flip top to bottom')),
-    ('ROTATE_90', _('Rotate 90 degrees clockwise')),
-    ('ROTATE_270', _('Rotate 90 degrees counter-clockwise')),
+    ('ROTATE_90', _('Rotate 90 degrees counter-clockwise')),
+    ('ROTATE_270', _('Rotate 90 degrees clockwise')),
     ('ROTATE_180', _('Rotate 180 degrees')),
 )
 
