@@ -582,7 +582,7 @@ class PhotoEffect(BaseEffect):
 
 
 class WaterMark(BaseEffect):
-    image = models.ImageField(_('image'), upload_to=PHOTOLOGUE_DIR+"/photos")
+    image = models.ImageField(_('image'), upload_to=PHOTOLOGUE_DIR+"/watermarks")
     style = models.CharField(_('style'), max_length=5, choices=(('tile', _('Tile')), ('scale', _('Scale'))), default='scale')
     opacity = models.FloatField(_('opacity'), default=1, help_text=_("The opacity of the overlay."))
     
