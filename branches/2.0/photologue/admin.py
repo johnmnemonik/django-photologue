@@ -20,7 +20,7 @@ class PhotoAdmin(admin.ModelAdmin):
 
     
 class PhotoEffectAdmin(admin.ModelAdmin):
-    list_display = ['name', 'description', 'admin_sample']
+    list_display = ('name', 'description', 'admin_sample')
     fieldsets = (
         (None, {
             'fields': ('name', 'description')

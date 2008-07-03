@@ -546,7 +546,7 @@ class PhotoEffect(BaseEffect):
     background_color = models.CharField(_('color'), max_length=7, default="#FFFFFF", help_text="The background color of the reflection gradient. Set this to match the background color of your page.")
 
     class Admin:
-        list_display = ['name', 'description', 'admin_sample']
+        list_display = ('name', 'description', 'admin_sample')
         fields = (
             (None, {
                 'fields': ('name', 'description')
@@ -591,7 +591,7 @@ class WaterMark(BaseEffect):
         verbose_name_plural = _('watermarks')
 
     class Admin:
-        list_display = ('name', 'opacity', 'style')
+        list_display = ('name', 'opacity', 'style', 'admin_sample')
         
     def process(self, im):
         mark = Image.open(self.get_image_filename())
