@@ -333,53 +333,59 @@ class ImageModel(models.Model):
             im = Image.open(self.get_image_filename())
         except IOError:
             return
-        if im.size == photosize.size():
-            shutil.copy(self.get_image_filename(),
-                        self._get_SIZE_path(photosize))
-            return
-        cur_width, cur_height = im.size
-        new_width, new_height = photosize.size()
-        if photosize.crop:
-            ratio = max(float(new_width)/cur_width,float(new_height)/cur_height)
-            x = (cur_width * ratio)
-            y = (cur_height * ratio)
-            xd = abs(new_width - x)
-            yd = abs(new_height - y)
-            x_diff = int(xd / 2)
-            y_diff = int(yd / 2)
-            if self.crop_from == 'top':
-                box = (int(x_diff), 0, int(x_diff+new_width), new_height)
-            elif self.crop_from == 'left':
-                box = (0, int(y_diff), new_width, int(y_diff+new_height))
-            elif self.crop_from == 'bottom':
-                box = (int(x_diff), int(yd), int(x_diff+new_width), int(y)) # y - yd = new_height
-            elif self.crop_from == 'right':
-                box = (int(xd), int(y_diff), int(x), int(y_diff+new_height)) # x - xd = new_width
-            else:
-                box = (int(x_diff), int(y_diff), int(x_diff+new_width), int(y_diff+new_height))
-            resized = im.resize((int(x), int(y)), Image.ANTIALIAS).crop(box)
-        else:
-            if not new_width == 0 and not new_height == 0:
-                if cur_width > cur_height:
-                    ratio = float(new_width)/cur_width
-                else:
-                    ratio = float(new_height)/cur_height
-            else:
-                if new_width == 0:
-                    ratio = float(new_height)/cur_height
-                else:
-                    ratio = float(new_width)/cur_width
-            resized = im.resize((int(cur_width*ratio), int(cur_height*ratio)), Image.ANTIALIAS)
-        
-        # Apply watermark if found
-        if photosize.watermark is not None:
-            resized = photosize.watermark.process(resized)
             
         # Apply effect if found
         if self.effect is not None:
-            resized = self.effect.process(resized)
+            im = self.effect.pre_process(im)
         elif photosize.effect is not None:
-            resized = photosize.effect.process(resized)
+            im = photosize.effect.pre_process(im)
+            
+        if im.size != photosize.size():        
+            cur_width, cur_height = im.size
+            new_width, new_height = photosize.size()
+            if photosize.crop:
+                ratio = max(float(new_width)/cur_width,float(new_height)/cur_height)
+                x = (cur_width * ratio)
+                y = (cur_height * ratio)
+                xd = abs(new_width - x)
+                yd = abs(new_height - y)
+                x_diff = int(xd / 2)
+                y_diff = int(yd / 2)
+                if self.crop_from == 'top':
+                    box = (int(x_diff), 0, int(x_diff+new_width), new_height)
+                elif self.crop_from == 'left':
+                    box = (0, int(y_diff), new_width, int(y_diff+new_height))
+                elif self.crop_from == 'bottom':
+                    box = (int(x_diff), int(yd), int(x_diff+new_width), int(y)) # y - yd = new_height
+                elif self.crop_from == 'right':
+                    box = (int(xd), int(y_diff), int(x), int(y_diff+new_height)) # x - xd = new_width
+                else:
+                    box = (int(x_diff), int(y_diff), int(x_diff+new_width), int(y_diff+new_height))
+                resized = im.resize((int(x), int(y)), Image.ANTIALIAS).crop(box)
+            else:
+                if not new_width == 0 and not new_height == 0:
+                    if cur_width > cur_height:
+                        ratio = float(new_width)/cur_width
+                    else:
+                        ratio = float(new_height)/cur_height
+                else:
+                    if new_width == 0:
+                        ratio = float(new_height)/cur_height
+                    else:
+                        ratio = float(new_width)/cur_width
+                resized = im.resize((int(cur_width*ratio), int(cur_height*ratio)), Image.ANTIALIAS)
+        else:
+            resized = im     
+            
+        # Apply watermark if found
+        if photosize.watermark is not None:
+            resized = photosize.watermark.process(resized)   
+            
+        # Apply effect if found
+        if self.effect is not None:
+            resized = self.effect.post_process(resized)
+        elif photosize.effect is not None:
+            resized = photosize.effect.post_process(resized)
             
         # save resized file
         resized_filename = getattr(self, "get_%s_path" % photosize.name)()
@@ -517,6 +523,17 @@ class BaseEffect(models.Model):
     admin_sample.short_description = 'Sample'
     admin_sample.allow_tags = True
     
+    def pre_process(self, im):
+        return im
+        
+    def post_process(self, im):
+        return im
+        
+    def process(self, im):
+        im = self.pre_process(im)
+        im = self.post_process(im)
+        return im
+    
     def __unicode__(self):
         return self.name
         
@@ -578,7 +595,7 @@ class PhotoEffect(BaseEffect):
             }),
         )
 
-    def process(self, im):
+    def pre_process(self, im):
         if self.transpose_method != '':
             method = getattr(Image, self.transpose_method)
             im = im.transpose(method)
@@ -594,9 +611,12 @@ class PhotoEffect(BaseEffect):
                 try:
                     im = im.filter(image_filter)
                 except ValueError:
-                    pass
+                    pass            
+        return im
+        
+    def post_process(self, im):
         if self.reflection_size != 0.0:
-            im = add_reflection(im, bgcolor=self.background_color, amount=self.reflection_size, opacity=self.reflection_strength)            
+            im = add_reflection(im, bgcolor=self.background_color, amount=self.reflection_size, opacity=self.reflection_strength)
         return im
 
 
