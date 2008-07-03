@@ -79,6 +79,14 @@ CROP_ANCHOR_CHOICES = (
     ('center', _('Center (Default)')),
 )
 
+IMAGE_TRANSPOSE_CHOICES = (
+    ('FLIP_LEFT_RIGHT', _('Flip left to right')),
+    ('FLIP_TOP_BOTTOM', _('Flip top to bottom')),
+    ('ROTATE_90', _('Rotate 90 degrees clockwise')),
+    ('ROTATE_270', _('Rotate 90 degrees counter-clockwise')),
+    ('ROTATE_180', _('Rotate 180 degrees')),
+)
+
 WATERMARK_STYLE_CHOICES = (
     ('tile', _('Tile')),
     ('scale', _('Scale')),
@@ -540,6 +548,7 @@ class BaseEffect(models.Model):
 
 class PhotoEffect(BaseEffect):
     """ A pre-defined effect to apply to photos """
+    transpose_method = models.CharField(_('rotate or flip'), max_length=15, blank=True, choices=IMAGE_TRANSPOSE_CHOICES)
     color = models.FloatField(_('color'), default=1.0, help_text=_("A factor of 0.0 gives a black and white image, a factor of 1.0 gives the original image."))
     brightness = models.FloatField(_('brightness'), default=1.0, help_text=_("A factor of 0.0 gives a black image, a factor of 1.0 gives the original image."))
     contrast = models.FloatField(_('contrast'), default=1.0, help_text=_("A factor of 0.0 gives a solid grey image, a factor of 1.0 gives the original image."))
@@ -555,6 +564,9 @@ class PhotoEffect(BaseEffect):
             (None, {
                 'fields': ('name', 'description')
             }),
+            ('Options', {
+                'fields': ('transpose_method',)
+            }),
             ('Adjustments', {
                 'fields': ('color', 'brightness', 'contrast', 'sharpness')
             }),
@@ -567,6 +579,9 @@ class PhotoEffect(BaseEffect):
         )
 
     def process(self, im):
+        if self.transpose_method != '':
+            method = getattr(Image, self.transpose_method)
+            im = im.transpose(method)
         if im.mode != 'RGB' and im.mode != 'RGBA':
             return im
         for name in ['Color', 'Brightness', 'Contrast', 'Sharpness']:
