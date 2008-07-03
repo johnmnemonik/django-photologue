@@ -361,7 +361,7 @@ class ImageModel(models.Model):
                     box = (int(xd), int(y_diff), int(x), int(y_diff+new_height)) # x - xd = new_width
                 else:
                     box = (int(x_diff), int(y_diff), int(x_diff+new_width), int(y_diff+new_height))
-                resized = im.resize((int(x), int(y)), Image.ANTIALIAS).crop(box)
+                im = im.resize((int(x), int(y)), Image.ANTIALIAS).crop(box)
             else:
                 if not new_width == 0 and not new_height == 0:
                     if cur_width > cur_height:
@@ -373,30 +373,28 @@ class ImageModel(models.Model):
                         ratio = float(new_height)/cur_height
                     else:
                         ratio = float(new_width)/cur_width
-                resized = im.resize((int(cur_width*ratio), int(cur_height*ratio)), Image.ANTIALIAS)
-        else:
-            resized = im     
+                im = im.resize((int(cur_width*ratio), int(cur_height*ratio)), Image.ANTIALIAS)  
             
         # Apply watermark if found
         if photosize.watermark is not None:
-            resized = photosize.watermark.process(resized)   
+            im = photosize.watermark.post_process(im)   
             
         # Apply effect if found
         if self.effect is not None:
-            resized = self.effect.post_process(resized)
+            im = self.effect.post_process(im)
         elif photosize.effect is not None:
-            resized = photosize.effect.post_process(resized)
+            im = photosize.effect.post_process(im)
             
-        # save resized file
-        resized_filename = getattr(self, "get_%s_path" % photosize.name)()
+        # save im file
+        im_filename = getattr(self, "get_%s_path" % photosize.name)()
         try:
             if im.format == 'JPEG':
-                resized.save(resized_filename, 'JPEG', quality=int(photosize.quality), optimize=True)
+                im.save(im_filename, 'JPEG', quality=int(photosize.quality), optimize=True)
             else:
-                resized.save(resized_filename)
+                im.save(im_filename)
         except IOError, e:
-            if os.path.isfile(resized_filename):
-                os.unlink(resized_filename)
+            if os.path.isfile(im_filename):
+                os.unlink(im_filename)
             raise e
 
     def remove_size(self, photosize, remove_dirs=True):
@@ -632,7 +630,7 @@ class WaterMark(BaseEffect):
     class Admin:
         list_display = ('name', 'opacity', 'style', 'admin_sample')
         
-    def process(self, im):
+    def post_process(self, im):
         mark = Image.open(self.get_image_filename())
         return apply_watermark(im, mark, self.style, self.opacity)
     
