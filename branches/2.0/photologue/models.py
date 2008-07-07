@@ -8,11 +8,11 @@ from inspect import isclass
 
 from django.db import models
 from django.db.models import signals
-from django.conf import settings
-from django.utils.functional import curry
-from django.core.urlresolvers import reverse
 from django.dispatch import dispatcher
+from django.conf import settings
+from django.core.urlresolvers import reverse
 from django.template.defaultfilters import slugify
+from django.utils.functional import curry
 from django.utils.translation import ugettext_lazy as _
 
 # Required PIL classes may or may not be available from the root namespace
