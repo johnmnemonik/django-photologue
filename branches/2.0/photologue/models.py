@@ -193,7 +193,7 @@ class GalleryUpload(models.Model):
                 raise Exception('"%s" in the .zip archive is corrupt.' % bad_file)
             count = 1
             gallery = Gallery.objects.create(title=self.title,
-                                             slug=slugify(self.title),
+                                             title_slug=slugify(self.title),
                                              description=self.description,
                                              is_public=self.is_public,
                                              tags=self.tags)
@@ -218,10 +218,8 @@ class GalleryUpload(models.Model):
                         continue
                     title = ' '.join([self.title, str(count)])
                     slug = slugify(title)
-                    photo = Photo(title=title, slug=slug,
+                    photo = Photo(title=title, title_slug=slug,
                                   caption=self.caption,
-                                  photographer=self.photographer,
-                                  info=self.info,
                                   is_public=self.is_public,
                                   tags=self.tags)
                     photo.save_image_file(filename, data)
@@ -618,7 +616,7 @@ class PhotoEffect(BaseEffect):
         return im
 
 
-class WaterMark(BaseEffect):
+class Watermark(BaseEffect):
     image = models.ImageField(_('image'), upload_to=PHOTOLOGUE_DIR+"/watermarks")
     style = models.CharField(_('style'), max_length=5, choices=WATERMARK_STYLE_CHOICES, default='scale')
     opacity = models.FloatField(_('opacity'), default=1, help_text=_("The opacity of the overlay."))
