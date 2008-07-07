@@ -2,11 +2,7 @@ from django.core.management.base import BaseCommand, CommandError
 from optparse import make_option
 
 class Command(BaseCommand):
-    option_list = BaseCommand.option_list + (
-        make_option('--reset', '-r', action='store_true', dest='reset', help='Reset photo cache before generating'),
-   )
-
-    help = ('Manages photologue cache file for the given sizes.')
+    help = ('Clears the photologue cache for the given sizes.')
     args = '[sizes]'
 
     requires_model_validation = True
@@ -22,26 +18,23 @@ def create_cache(sizes, options):
     from django.db.models.loading import get_model
     Photo = get_model('photologue', 'Photo')
     PhotoSize = get_model('photologue', 'PhotoSize')
-    reset = options.get('reset', None)
     
     size_list = [size.strip(' ,') for size in sizes]
     
     if len(size_list) < 1:
-        sizes = PhotoSize.objects.filter(pre_cache=True)
+        sizes = PhotoSize.objects.all()
     else:
         sizes = PhotoSize.objects.filter(name__in=size_list)
         
     if not len(sizes):
         raise CommandError('No photo sizes were found.')
         
-    print 'Caching photos, this may take a while...'
+    print 'Flushing cache...'
         
     for photo in Photo.objects.all():
        for photosize in sizes:
-           print 'Creating %s size images' % photosize.name
+           print 'Flushing %s size images' % photosize.name
            for photo in Photo.objects.all():
-               if reset:
-                    photo.remove_size(photosize)
-               photo.create_size(photosize)
+               photo.remove_size(photosize)
 
 
