@@ -1,7 +1,8 @@
 from admin import *
 from django.conf import settings
 from django.conf.urls.defaults import *
-from models import Gallery, Photo
+from django.contrib import databrowse
+from models import *
 
 # Number of random images from the gallery to display.
 SAMPLE_SIZE = ":%s" % getattr(settings, 'GALLERY_SAMPLE_SIZE', 5)
@@ -9,6 +10,16 @@ SAMPLE_SIZE = ":%s" % getattr(settings, 'GALLERY_SAMPLE_SIZE', 5)
 # admin
 urlpatterns = patterns('', 
     (r'^admin/(.*)', photologue_admin.root),
+)
+
+# databrowse
+databrowse.site.register(Gallery)
+databrowse.site.register(Photo)
+databrowse.site.register(PhotoSize)
+databrowse.site.register(PhotoEffect)
+databrowse.site.register(Watermark)
+urlpatterns += patterns('',
+    (r'^browse/(.*)', databrowse.site.root),
 )
 
 # galleries
