@@ -10,6 +10,7 @@ class GalleryAdmin(admin.ModelAdmin):
     list_filter = ['date_added', 'is_public']
     date_hierarchy = 'date_added'
     prepopulated_fields = {'title_slug': ('title',)}
+    
 
     
 class PhotoAdmin(admin.ModelAdmin):
@@ -56,14 +57,14 @@ class WatermarkAdmin(admin.ModelAdmin):
     list_display = ('name', 'opacity', 'style')
 
     
-pl_admin = admin.AdminSite()
+photologue_admin = admin.AdminSite()
 
-pl_admin.register(Gallery, GalleryAdmin)
-pl_admin.register(GalleryUpload)
-pl_admin.register(Photo, PhotoAdmin)
-pl_admin.register(PhotoEffect, PhotoEffectAdmin)
-pl_admin.register(PhotoSize, PhotoSizeAdmin)
-pl_admin.register(Watermark, WatermarkAdmin)
+photologue_admin.register(Gallery, GalleryAdmin)
+photologue_admin.register(GalleryUpload)
+photologue_admin.register(Photo, PhotoAdmin)
+photologue_admin.register(PhotoEffect, PhotoEffectAdmin)
+photologue_admin.register(PhotoSize, PhotoSizeAdmin)
+photologue_admin.register(Watermark, WatermarkAdmin)
 
 
 

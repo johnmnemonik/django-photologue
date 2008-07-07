@@ -106,13 +106,13 @@ IMAGE_FILTERS_HELP_TEXT = _('Chain multiple filters using the following pattern 
 class Gallery(models.Model):
     date_added = models.DateTimeField(_('date published'), default=datetime.now)
     title = models.CharField(_('title'), max_length=100, unique=True)
-    title_slug = models.SlugField(_('title slug'), prepopulate_from=('title',), unique=True,
+    title_slug = models.SlugField(_('title slug'), unique=True,
                                   help_text=_('A "slug" is a unique URL-friendly title for an object.'))
     description = models.TextField(_('description'), blank=True)
     is_public = models.BooleanField(_('is public'), default=True,
                                     help_text=_('Public galleries will be displayed in the default views.'))
     photos = models.ManyToManyField('Photo', related_name='galleries', verbose_name=_('photos'),
-                                    null=True, blank=True, filter_interface=models.HORIZONTAL)
+                                    null=True, blank=True)
     tags = TagField(help_text=tagfield_help_text, verbose_name=_('tags'))
 
     class Meta:
@@ -120,11 +120,6 @@ class Gallery(models.Model):
         get_latest_by = 'date_added'
         verbose_name = _('gallery')
         verbose_name_plural = _('galleries')
-
-    class Admin:
-        list_display = ('title', 'date_added', 'photo_count', 'is_public')
-        list_filter = ['date_added', 'is_public']
-        date_hierarchy = 'date_added'
 
     def __unicode__(self):
         return self.title
@@ -171,9 +166,6 @@ class GalleryUpload(models.Model):
     description = models.TextField(_('description'), blank=True, help_text=_('A description of this Gallery.'))
     is_public = models.BooleanField(_('is public'), default=True, help_text=_('Uncheck this to make the uploaded gallery and included photographs private.'))
     tags = models.CharField(max_length=255, blank=True, help_text=tagfield_help_text, verbose_name=_('tags'))
-
-    class Admin:
-        pass
 
     class Meta:
         verbose_name = _('gallery upload')
@@ -451,7 +443,7 @@ class ImageModel(models.Model):
 
 class Photo(ImageModel):
     title = models.CharField(_('title'), max_length=100, unique=True)
-    title_slug = models.SlugField(_('slug'), prepopulate_from=('title',), unique=True,
+    title_slug = models.SlugField(_('slug'), unique=True,
                                   help_text=('A "slug" is a unique URL-friendly title for an object.'))
     caption = models.TextField(_('caption'), blank=True)
     date_added = models.DateTimeField(_('date added'), default=datetime.now, editable=False)
@@ -463,11 +455,6 @@ class Photo(ImageModel):
         get_latest_by = 'date_added'
         verbose_name = _("photo")
         verbose_name_plural = _("photos")
-
-    class Admin:
-        list_display = ('title', 'date_taken', 'date_added', 'is_public', 'tags', 'view_count', 'admin_thumbnail')
-        list_filter = ['date_added', 'is_public']
-        list_per_page = 10
 
     def __unicode__(self):
         return self.title
@@ -571,26 +558,6 @@ class PhotoEffect(BaseEffect):
     reflection_strength = models.FloatField(_('strength'), default=0.6, help_text="The initial opacity of the reflection gradient.")
     background_color = models.CharField(_('color'), max_length=7, default="#FFFFFF", help_text="The background color of the reflection gradient. Set this to match the background color of your page.")
 
-    class Admin:
-        list_display = ('name', 'description', 'admin_sample')
-        fields = (
-            (None, {
-                'fields': ('name', 'description')
-            }),
-            ('Options', {
-                'fields': ('transpose_method',)
-            }),
-            ('Adjustments', {
-                'fields': ('color', 'brightness', 'contrast', 'sharpness')
-            }),
-            ('Filters', {
-                'fields': ('filters',)
-            }),
-            ('Reflection', {
-                'fields': ('reflection_size', 'reflection_strength', 'background_color')
-            }),
-        )
-
     def pre_process(self, im):
         if self.transpose_method != '':
             method = getattr(Image, self.transpose_method)
@@ -624,9 +591,6 @@ class Watermark(BaseEffect):
     class Meta:
         verbose_name = _('watermark')
         verbose_name_plural = _('watermarks')
-
-    class Admin:
-        list_display = ('name', 'opacity', 'style', 'admin_sample')
         
     def post_process(self, im):
         mark = Image.open(self.get_image_filename())
@@ -648,20 +612,6 @@ class PhotoSize(models.Model):
         ordering = ['width', 'height']
         verbose_name = _('photo size')
         verbose_name_plural = _('photo sizes')
-
-    class Admin:
-        list_display = ('name', 'width', 'height', 'crop', 'pre_cache', 'effect', 'increment_count')
-        fields = (
-            (None, {
-                'fields': ('name', 'width', 'height', 'quality')
-            }),
-            ('Options', {
-                'fields': ('crop', 'pre_cache', 'increment_count')
-            }),
-            ('Enhancements', {
-                'fields': ('effect', 'watermark',)
-            }),
-        )
 
     def __unicode__(self):
         return self.name
