@@ -10,8 +10,8 @@ class GalleryAdmin(admin.ModelAdmin):
     list_filter = ['date_added', 'is_public']
     date_hierarchy = 'date_added'
     prepopulated_fields = {'title_slug': ('title',)}
+    filter_horizontal = ('photos',)
     
-
     
 class PhotoAdmin(admin.ModelAdmin):
     list_display = ('title', 'date_taken', 'date_added', 'is_public', 'tags', 'view_count', 'admin_thumbnail')
@@ -65,9 +65,3 @@ photologue_admin.register(Photo, PhotoAdmin)
 photologue_admin.register(PhotoEffect, PhotoEffectAdmin)
 photologue_admin.register(PhotoSize, PhotoSizeAdmin)
 photologue_admin.register(Watermark, WatermarkAdmin)
-
-
-
-
-
-
