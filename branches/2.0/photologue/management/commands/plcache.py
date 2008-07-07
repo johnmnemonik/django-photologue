@@ -24,7 +24,7 @@ def create_cache(sizes, options):
     from django.db.models.loading import get_model
     Photo = get_model('photologue', 'Photo')
     PhotoSize = get_model('photologue', 'PhotoSize')
-    reset = options.get('reset')
+    reset = options.get('reset', None)
 
     print 'Caching photos, this may take a while...'
     
@@ -35,7 +35,7 @@ def create_cache(sizes, options):
         
     for photo in Photo.objects.all():
        for photosize in sizes:
-           print 'pre-caching %s size' % photosize.name
+           print 'Creating %s size images' % photosize.name
            if photosize is None:
                raise CommandError('A PhotoSize named "%s" was not found.' % (photosize.name))
            else:
