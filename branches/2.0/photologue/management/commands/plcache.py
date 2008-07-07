@@ -28,10 +28,12 @@ def create_cache(sizes, options):
 
     print 'Caching photos, this may take a while...'
     
-    if len(sizes)<1:
+    size_list = [size.strip(' ,') for size in sizes]
+    
+    if len(size_list) < 1:
         sizes = PhotoSize.objects.filter(pre_cache=True)
     else:
-        sizes = PhotoSize.objects.filter(name__in=sizes)
+        sizes = PhotoSize.objects.filter(name__in=size_list)
         
     for photo in Photo.objects.all():
        for photosize in sizes:
