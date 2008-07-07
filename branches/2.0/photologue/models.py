@@ -225,7 +225,7 @@ class GalleryUpload(models.Model):
 
 
 class ImageModel(models.Model):
-    image = models.ImageField(_('photograph'), upload_to=PHOTOLOGUE_DIR+"/photos")
+    image = models.ImageField(_('original image'), upload_to=PHOTOLOGUE_DIR+"/photos")
     date_taken = models.DateTimeField(_('date taken'), null=True, blank=True, editable=False)
     view_count = models.PositiveIntegerField(default=0, editable=False)
     crop_from = models.CharField(_('crop from'), blank=True, max_length=10, default='center', choices=CROP_ANCHOR_CHOICES)
