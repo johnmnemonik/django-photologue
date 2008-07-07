@@ -1,6 +1,5 @@
 from django.core.management.base import BaseCommand, CommandError
 from optparse import make_option
-from photologue.models import PhotoSizeCache
 
 class Command(BaseCommand):
     option_list = BaseCommand.option_list + (
