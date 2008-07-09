@@ -60,10 +60,12 @@ photologue_admin.register(PhotoEffect, PhotoEffectAdmin)
 photologue_admin.register(PhotoSize, PhotoSizeAdmin)
 photologue_admin.register(Watermark, WatermarkAdmin)
 
-# register the global admin
-admin.site.register(Gallery, GalleryAdmin)
-admin.site.register(GalleryUpload)
-admin.site.register(Photo, PhotoAdmin)
-admin.site.register(PhotoEffect, PhotoEffectAdmin)
-admin.site.register(PhotoSize, PhotoSizeAdmin)
-admin.site.register(Watermark, WatermarkAdmin)
+try:   
+    admin.site.register(Gallery, GalleryAdmin)
+    admin.site.register(GalleryUpload)
+    admin.site.register(Photo, PhotoAdmin)
+    admin.site.register(PhotoEffect, PhotoEffectAdmin)
+    admin.site.register(PhotoSize, PhotoSizeAdmin)
+    admin.site.register(Watermark, WatermarkAdmin)
+except:
+    pass
