@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Photologue Preview 2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-07-08 14:44+0200\n"
-"PO-Revision-Date: 2008-07-08 22:14+0100\n"
+"POT-Creation-Date: 2008-07-08 23:13+0200\n"
+"PO-Revision-Date: 2008-07-08 23:14+0100\n"
 "Last-Translator: Jakub Wiśniowski <restless.being@gmail.com>\n"
 "Language-Team: Jakub Wiśniowski <restless.being@gmail.com>\n"
 "MIME-Version: 1.0\n"
@@ -207,8 +207,9 @@ msgid "gallery uploads"
 msgstr "wrzucenie galerii"
 
 #: models.py:228
-msgid "original image"
-msgstr "oryginalny obraz"
+#: models.py:587
+msgid "image"
+msgstr "obraz"
 
 #: models.py:229
 msgid "date taken"
@@ -304,10 +305,6 @@ msgstr "Wysokość odbicia jako procent oryginalnego obrazu. Współczynnik 0.0 
 msgid "strength"
 msgstr "intensywność"
 
-#: models.py:587
-msgid "image"
-msgstr "obraz"
-
 #: models.py:588
 msgid "style"
 msgstr "styl"
@@ -399,4 +396,7 @@ msgstr "rozmiary zdjęć"
 #: models.py:632
 msgid "A PhotoSize must have a positive height or width."
 msgstr "PhotoSize musi mieć dodatnią wysokość i szerokość."
+
+#~ msgid "original image"
+#~ msgstr "oryginalny obraz"
 
