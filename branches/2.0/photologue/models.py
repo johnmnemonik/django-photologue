@@ -275,7 +275,9 @@ class ImageModel(models.Model):
         return photosize
         
     def _get_SIZE_size(self, photosize):
-        return Image.open(self._get_SIZE_path(photosize)).size        
+        if not self.size_exists(photosize):
+            self.create_size(photosize)
+        return Image.open(self._get_SIZE_filename(photosize)).size                    
 
     def _get_SIZE_url(self, photosize):
         if not self.size_exists(photosize):
@@ -285,7 +287,7 @@ class ImageModel(models.Model):
             self.save(update=True)
         return '/'.join([self.cache_url(), self._get_filename_for_size(photosize.name)])
 
-    def _get_SIZE_path(self, photosize):
+    def _get_SIZE_filename(self, photosize):
         return os.path.join(self.cache_path(),
                             self._get_filename_for_size(photosize.name))
 
@@ -304,11 +306,11 @@ class ImageModel(models.Model):
                     curry(self._get_SIZE_photosize, photosize=photosize))
             setattr(self, 'get_%s_url' % photosize.name,
                     curry(self._get_SIZE_url, photosize=photosize))
-            setattr(self, 'get_%s_path' % photosize.name,
-                    curry(self._get_SIZE_path, photosize=photosize))
+            setattr(self, 'get_%s_filename' % photosize.name,
+                    curry(self._get_SIZE_filename, photosize=photosize))
 
     def size_exists(self, photosize):
-        func = getattr(self, "get_%s_path" % photosize.name, None)
+        func = getattr(self, "get_%s_filename" % photosize.name, None)
         if func is not None:
             if os.path.isfile(func()):
                 return True
@@ -330,9 +332,9 @@ class ImageModel(models.Model):
         elif photosize.effect is not None:
             im = photosize.effect.pre_process(im)
             
-        if im.size != photosize.size():        
+        if im.size != photosize.size:        
             cur_width, cur_height = im.size
-            new_width, new_height = photosize.size()
+            new_width, new_height = photosize.size
             if photosize.crop:
                 ratio = max(float(new_width)/cur_width,float(new_height)/cur_height)
                 x = (cur_width * ratio)
@@ -376,7 +378,7 @@ class ImageModel(models.Model):
             im = photosize.effect.post_process(im)
             
         # save im file
-        im_filename = getattr(self, "get_%s_path" % photosize.name)()
+        im_filename = getattr(self, "get_%s_filename" % photosize.name)()
         try:
             if im.format == 'JPEG':
                 im.save(im_filename, 'JPEG', quality=int(photosize.quality), optimize=True)
@@ -390,7 +392,7 @@ class ImageModel(models.Model):
     def remove_size(self, photosize, remove_dirs=True):
         if not self.size_exists(photosize):
             return
-        filename = getattr(self, "get_%s_path" % photosize.name)()
+        filename = getattr(self, "get_%s_filename" % photosize.name)()
         if os.path.isfile(filename):
             os.remove(filename)
         if remove_dirs:
@@ -638,8 +640,11 @@ class PhotoSize(models.Model):
         self.clear_cache()
         super(PhotoSize, self).delete()
 
-    def size(self):
+    def _get_size(self):
         return (self.width, self.height)
+    def _set_size(self, value):
+        self.width, self.height = value
+    size = property(_get_size, _set_size)
 
 
 class PhotoSizeCache(object):
