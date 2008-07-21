@@ -365,7 +365,9 @@ class ImageModel(models.Model):
                         ratio = float(new_height)/cur_height
                     else:
                         ratio = float(new_width)/cur_width
-                im = im.resize((int(cur_width*ratio), int(cur_height*ratio)), Image.ANTIALIAS)  
+                im = im.resize((int(round(cur_width*ratio)),
+                                int(round(cur_height*ratio))),
+                               Image.ANTIALIAS)  
             
         # Apply watermark if found
         if photosize.watermark is not None:
