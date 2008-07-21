@@ -293,20 +293,14 @@ class ImageModel(models.Model):
 
     def add_accessor_methods(self, *args, **kwargs):
         cache = PhotoSizeCache()
-        if len(cache.sizes):
-            sizes = cache.sizes.values()
-        else:
-            sizes = PhotoSize.objects.all()
-            for size in sizes:
-                cache.sizes[size.name] = size
-        for photosize in sizes:
-            setattr(self, 'get_%s_size' % photosize.name,
+        for name, photosize in cache.sizes.items():
+            setattr(self, 'get_%s_size' % name,
                     curry(self._get_SIZE_size, photosize=photosize))
-            setattr(self, 'get_%s_photosize' % photosize.name,
+            setattr(self, 'get_%s_photosize' % name,
                     curry(self._get_SIZE_photosize, photosize=photosize))
-            setattr(self, 'get_%s_url' % photosize.name,
+            setattr(self, 'get_%s_url' % name,
                     curry(self._get_SIZE_url, photosize=photosize))
-            setattr(self, 'get_%s_filename' % photosize.name,
+            setattr(self, 'get_%s_filename' % name,
                     curry(self._get_SIZE_filename, photosize=photosize))
 
     def size_exists(self, photosize):
@@ -654,6 +648,10 @@ class PhotoSizeCache(object):
 
     def __init__(self):
         self.__dict__ = self.__state
+        if not len(self.sizes):
+            sizes = PhotoSize.objects.all()
+            for size in sizes:
+                self.sizes[size.name] = size
 
     def reset(self):
         self.sizes = {}
