@@ -2,7 +2,7 @@ import os
 import unittest
 from django.conf import settings
 from django.core.files.uploadedfile import InMemoryUploadedFile
-from django.test import TestCase, client
+from django.test import TestCase
 
 from models import *
 
