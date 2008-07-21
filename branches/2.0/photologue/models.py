@@ -268,6 +268,7 @@ class ImageModel(models.Model):
         return os.path.basename(self.image)
 
     def _get_filename_for_size(self, size):
+        size = getattr(size, 'name', size)
         base, ext = os.path.splitext(self.image_filename())
         return ''.join([base, '_', size, ext])
 

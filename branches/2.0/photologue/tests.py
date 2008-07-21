@@ -90,9 +90,11 @@ class PhotoTest(PLTest):
         self.assertEquals(self.p.get_test_size(),
                           Image.open(self.p.get_test_filename()).size)
         self.assertEquals(self.p.get_test_url(),
-                          self.p.cache_url() + '/' + 'test_test.jpg')
+                          self.p.cache_url() + '/' + \
+                          self.p._get_filename_for_size(self.s))
         self.assertEquals(self.p.get_test_filename(),
-                          os.path.join(self.p.cache_path(), 'test_test.jpg'))
+                          os.path.join(self.p.cache_path(),
+                          self.p._get_filename_for_size(self.s)))
         
         
 class ImageResizeTest(PLTest):        
@@ -128,5 +130,20 @@ class ImageResizeTest(PLTest):
         self.s.crop = True
         self.s.save()
         self.p = TestPhoto.objects.get(name='test')
-        self.assertEquals(self.p.get_test_size(), self.s.size) 
+        self.assertEquals(self.p.get_test_size(), self.s.size)
+
+
+class PhotoEffectTest(PLTest):
+    def test(self):
+        effect = PhotoEffect(name='test')
+        im = Image.open(self.p.get_image_filename())
+        self.assert_(isinstance(effect.pre_process(im), Image.Image))
+        self.assert_(isinstance(effect.post_process(im), Image.Image))
+        self.assert_(isinstance(effect.process(im), Image.Image))
+
+
+class PhotoSizeCacheTest(PLTest):
+    def test(self):
+        cache = PhotoSizeCache()
+        self.assertEqual(cache.sizes['test'], self.s)     
         
