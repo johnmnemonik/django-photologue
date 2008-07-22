@@ -197,6 +197,12 @@ class ImageResizeTest(PLTest):
         self.s.save()
         self.assertEquals(self.pl.get_test_size(), (800, 600))
         
+    def test_resize_no_upscale_crop(self):
+        self.s.size = (2000, 2000)
+        self.s.crop = True
+        self.s.save()
+        self.assertEquals(self.pl.get_test_size(), (2000, 2000))
+        
     def test_resize_upscale(self):
         self.s.size = (2000, 2000)
         self.s.upscale = True
