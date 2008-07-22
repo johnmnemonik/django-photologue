@@ -272,15 +272,17 @@ class ImageModel(models.Model):
         base, ext = os.path.splitext(self.image_filename())
         return ''.join([base, '_', size, ext])
 
-    def _get_SIZE_photosize(self, photosize):
-        return photosize
+    def _get_SIZE_photosize(self, size):
+        return PhotoSizeCache().sizes.get(size)
         
-    def _get_SIZE_size(self, photosize):
+    def _get_SIZE_size(self, size):
+        photosize = PhotoSizeCache().sizes.get(size)
         if not self.size_exists(photosize):
             self.create_size(photosize)
-        return Image.open(self._get_SIZE_filename(photosize)).size                    
+        return Image.open(self._get_SIZE_filename(size)).size                    
 
-    def _get_SIZE_url(self, photosize):
+    def _get_SIZE_url(self, size):
+        photosize = PhotoSizeCache().sizes.get(size)
         if not self.size_exists(photosize):
             self.create_size(photosize)
         if photosize.increment_count:
@@ -288,21 +290,21 @@ class ImageModel(models.Model):
             self.save(update=True)
         return '/'.join([self.cache_url(), self._get_filename_for_size(photosize.name)])
 
-    def _get_SIZE_filename(self, photosize):
+    def _get_SIZE_filename(self, size):
+        photosize = PhotoSizeCache().sizes.get(size)
         return os.path.join(self.cache_path(),
                             self._get_filename_for_size(photosize.name))
 
     def add_accessor_methods(self, *args, **kwargs):
-        cache = PhotoSizeCache()
-        for name, photosize in cache.sizes.items():
-            setattr(self, 'get_%s_size' % name,
-                    curry(self._get_SIZE_size, photosize=photosize))
-            setattr(self, 'get_%s_photosize' % name,
-                    curry(self._get_SIZE_photosize, photosize=photosize))
-            setattr(self, 'get_%s_url' % name,
-                    curry(self._get_SIZE_url, photosize=photosize))
-            setattr(self, 'get_%s_filename' % name,
-                    curry(self._get_SIZE_filename, photosize=photosize))
+        for size in PhotoSizeCache().sizes.keys():
+            setattr(self, 'get_%s_size' % size,
+                    curry(self._get_SIZE_size, size=size))
+            setattr(self, 'get_%s_photosize' % size,
+                    curry(self._get_SIZE_photosize, size=size))
+            setattr(self, 'get_%s_url' % size,
+                    curry(self._get_SIZE_url, size=size))
+            setattr(self, 'get_%s_filename' % size,
+                    curry(self._get_SIZE_filename, size=size))
 
     def size_exists(self, photosize):
         func = getattr(self, "get_%s_filename" % photosize.name, None)
@@ -666,11 +668,11 @@ class PhotoSizeCache(object):
 def add_methods(sender, instance, signal, *args, **kwargs):
     """ Adds methods to access sized images (urls, paths)
 
-    after the photo models __init__ function completes,
+    after the Photo model's __init__ function completes,
     this method calls "add_accessor_methods" on each instance.
     """
     if hasattr(instance, 'add_accessor_methods'):
-        instance.add_accessor_methods()
+        instance.add_accessor_methods()        
 
 # connect the add_accessor_methods function to the post_init signal
 dispatcher.connect(add_methods, signal=signals.post_init)

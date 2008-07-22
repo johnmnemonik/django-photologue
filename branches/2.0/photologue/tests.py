@@ -104,45 +104,38 @@ class ImageResizeTest(PLTest):
     def test_resize_to_fit_width(self):
         self.s.size = (100, 0)
         self.s.save()
-        self.p = TestPhoto.objects.get(name='test')
         self.assertEquals(self.p.get_test_size(), (100, 75))
 
     def test_resize_to_fit_height(self):
         self.s.size = (0, 100)
         self.s.save()
-        self.p = TestPhoto.objects.get(name='test')
         self.assertEquals(self.p.get_test_size(), (133, 100))
         
     def test_resize_and_crop(self):
         self.s.crop = True
         self.s.save()
-        self.p = TestPhoto.objects.get(name='test')
         self.assertEquals(self.p.get_test_size(), self.s.size)
         
     def test_resize_rounding_to_fit(self):
         self.s.size = (113, 113)
         self.s.save()
-        self.p = TestPhoto.objects.get(name='test')
         self.assertEquals(self.p.get_test_size(), (113,85))  
         
     def test_resize_rounding_cropped(self):
         self.s.size = (113, 113)
         self.s.crop = True
         self.s.save()
-        self.p = TestPhoto.objects.get(name='test')
         self.assertEquals(self.p.get_test_size(), self.s.size)
         
     def test_resize_no_upscale(self):
         self.s.size = (2000, 2000)
         self.s.save()
-        self.p = TestPhoto.objects.get(name='test')
         self.assertEquals(self.p.get_test_size(), (1600, 1200))
         
     def test_resize_upscale(self):
         self.s.size = (2000, 2000)
         self.s.upscale = True
         self.s.save()
-        self.p = TestPhoto.objects.get(name='test')
         self.assertEquals(self.p.get_test_size(), (2000, 1500))
 
 
@@ -158,5 +151,5 @@ class PhotoEffectTest(PLTest):
 class PhotoSizeCacheTest(PLTest):
     def test(self):
         cache = PhotoSizeCache()
-        self.assertEqual(cache.sizes['test'], self.s)     
+        self.assertEqual(cache.sizes['test'], self.s)    
         
