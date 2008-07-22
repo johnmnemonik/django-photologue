@@ -105,11 +105,23 @@ class ImageResizeTest(PLTest):
         self.s.size = (100, 0)
         self.s.save()
         self.assertEquals(self.p.get_test_size(), (100, 75))
+        
+    def test_resize_to_fit_width_enlarge(self):
+        self.s.size = (2000, 0)
+        self.s.upscale = True
+        self.s.save()
+        self.assertEquals(self.p.get_test_size(), (2000, 1500))
 
     def test_resize_to_fit_height(self):
         self.s.size = (0, 100)
         self.s.save()
         self.assertEquals(self.p.get_test_size(), (133, 100))
+        
+    def test_resize_to_fit_height_enlarge(self):
+        self.s.size = (0, 2000)
+        self.s.upscale = True
+        self.s.save()
+        self.assertEquals(self.p.get_test_size(), (2667, 2000))
         
     def test_resize_and_crop(self):
         self.s.crop = True
@@ -126,6 +138,16 @@ class ImageResizeTest(PLTest):
         self.s.crop = True
         self.s.save()
         self.assertEquals(self.p.get_test_size(), self.s.size)
+        
+    def test_resize_one_dimension_width(self):
+        self.s.size = (1500, 1200)
+        self.s.save()
+        self.assertEquals(self.p.get_test_size(), (1500, 1125))
+        
+    def test_resize_one_dimension_height(self):
+        self.s.size = (1600, 1100)
+        self.s.save()
+        self.assertEquals(self.p.get_test_size(), (1467, 1100))
         
     def test_resize_no_upscale(self):
         self.s.size = (2000, 2000)

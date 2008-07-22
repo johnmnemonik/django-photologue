@@ -337,10 +337,8 @@ class ImageModel(models.Model):
             im = im.resize((int(x), int(y)), Image.ANTIALIAS).crop(box)
         else:
             if not new_width == 0 and not new_height == 0:
-                if cur_width > cur_height:
-                    ratio = float(new_width)/cur_width
-                else:
-                    ratio = float(new_height)/cur_height
+                ratio = min(float(new_width)/cur_width,
+                            float(new_height)/cur_height)
             else:
                 if new_width == 0:
                     ratio = float(new_height)/cur_height
@@ -370,7 +368,7 @@ class ImageModel(models.Model):
             if photosize.upscale or \
                im.size[0] >= photosize.size[0] and \
                im.size[1] >= photosize.size[1]:
-                im = self.resize_image(im, photosize)
+                im = self.resize_image(im, photosize)    
         # Apply watermark if found
         if photosize.watermark is not None:
             im = photosize.watermark.post_process(im)   
