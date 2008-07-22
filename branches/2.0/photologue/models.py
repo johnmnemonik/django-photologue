@@ -310,6 +310,44 @@ class ImageModel(models.Model):
             if os.path.isfile(func()):
                 return True
         return False
+        
+    def resize_image(self, im, photosize):
+        cur_width, cur_height = im.size
+        new_width, new_height = photosize.size
+        if photosize.crop:
+            ratio = max(float(new_width)/cur_width,float(new_height)/cur_height)
+            x = (cur_width * ratio)
+            y = (cur_height * ratio)
+            xd = abs(new_width - x)
+            yd = abs(new_height - y)
+            x_diff = int(xd / 2)
+            y_diff = int(yd / 2)
+            if self.crop_from == 'top':
+                box = (int(x_diff), 0, int(x_diff+new_width), new_height)
+            elif self.crop_from == 'left':
+                box = (0, int(y_diff), new_width, int(y_diff+new_height))
+            elif self.crop_from == 'bottom':
+                box = (int(x_diff), int(yd), int(x_diff+new_width), int(y)) # y - yd = new_height
+            elif self.crop_from == 'right':
+                box = (int(xd), int(y_diff), int(x), int(y_diff+new_height)) # x - xd = new_width
+            else:
+                box = (int(x_diff), int(y_diff), int(x_diff+new_width), int(y_diff+new_height))
+            im = im.resize((int(x), int(y)), Image.ANTIALIAS).crop(box)
+        else:
+            if not new_width == 0 and not new_height == 0:
+                if cur_width > cur_height:
+                    ratio = float(new_width)/cur_width
+                else:
+                    ratio = float(new_height)/cur_height
+            else:
+                if new_width == 0:
+                    ratio = float(new_height)/cur_height
+                else:
+                    ratio = float(new_width)/cur_width
+            im = im.resize((int(round(cur_width*ratio)),
+                            int(round(cur_height*ratio))),
+                           Image.ANTIALIAS)
+        return im
 
     def create_size(self, photosize):
         if self.size_exists(photosize):
@@ -320,61 +358,26 @@ class ImageModel(models.Model):
             im = Image.open(self.get_image_filename())
         except IOError:
             return
-            
         # Apply effect if found
         if self.effect is not None:
             im = self.effect.pre_process(im)
         elif photosize.effect is not None:
             im = photosize.effect.pre_process(im)
-            
-        if im.size != photosize.size:        
-            cur_width, cur_height = im.size
-            new_width, new_height = photosize.size
-            if photosize.crop:
-                ratio = max(float(new_width)/cur_width,float(new_height)/cur_height)
-                x = (cur_width * ratio)
-                y = (cur_height * ratio)
-                xd = abs(new_width - x)
-                yd = abs(new_height - y)
-                x_diff = int(xd / 2)
-                y_diff = int(yd / 2)
-                if self.crop_from == 'top':
-                    box = (int(x_diff), 0, int(x_diff+new_width), new_height)
-                elif self.crop_from == 'left':
-                    box = (0, int(y_diff), new_width, int(y_diff+new_height))
-                elif self.crop_from == 'bottom':
-                    box = (int(x_diff), int(yd), int(x_diff+new_width), int(y)) # y - yd = new_height
-                elif self.crop_from == 'right':
-                    box = (int(xd), int(y_diff), int(x), int(y_diff+new_height)) # x - xd = new_width
-                else:
-                    box = (int(x_diff), int(y_diff), int(x_diff+new_width), int(y_diff+new_height))
-                im = im.resize((int(x), int(y)), Image.ANTIALIAS).crop(box)
-            else:
-                if not new_width == 0 and not new_height == 0:
-                    if cur_width > cur_height:
-                        ratio = float(new_width)/cur_width
-                    else:
-                        ratio = float(new_height)/cur_height
-                else:
-                    if new_width == 0:
-                        ratio = float(new_height)/cur_height
-                    else:
-                        ratio = float(new_width)/cur_width
-                im = im.resize((int(round(cur_width*ratio)),
-                                int(round(cur_height*ratio))),
-                               Image.ANTIALIAS)  
-            
+        # Resize/crop image
+        if im.size != photosize.size:
+            if photosize.upscale or \
+               im.size[0] >= photosize.size[0] and \
+               im.size[1] >= photosize.size[1]:
+                im = self.resize_image(im, photosize)
         # Apply watermark if found
         if photosize.watermark is not None:
             im = photosize.watermark.post_process(im)   
-            
         # Apply effect if found
         if self.effect is not None:
             im = self.effect.post_process(im)
         elif photosize.effect is not None:
             im = photosize.effect.post_process(im)
-            
-        # save im file
+        # Save file
         im_filename = getattr(self, "get_%s_filename" % photosize.name)()
         try:
             if im.format == 'JPEG':
@@ -601,9 +604,10 @@ class PhotoSize(models.Model):
     width = models.PositiveIntegerField(_('width'), default=0, help_text=_('Leave to size the image to the set height'))
     height = models.PositiveIntegerField(_('height'), default=0, help_text=_('Leave to size the image to the set width'))
     quality = models.PositiveIntegerField(_('quality'), choices=JPEG_QUALITY_CHOICES, default=70, help_text=_('JPEG image quality.'))
+    upscale = models.BooleanField(_('upscale images?'), default=False, help_text=_('If selected the image will be scaled up if necessary to fit the supplied dimensions'))
     crop = models.BooleanField(_('crop to fit?'), default=False, help_text=_('If selected the image will be scaled and cropped to fit the supplied dimensions.'))
     pre_cache = models.BooleanField(_('pre-cache?'), default=False, help_text=_('If selected this photo size will be pre-cached as photos are added.'))
-    increment_count = models.BooleanField(_('Increment view count?'), default=False, help_text=_('If selected the image\'s "view_count" will be incremented when this photo size is displayed.'))
+    increment_count = models.BooleanField(_('increment view count?'), default=False, help_text=_('If selected the image\'s "view_count" will be incremented when this photo size is displayed.'))
     effect = models.ForeignKey('PhotoEffect', null=True, blank=True, related_name='photo_sizes', verbose_name=_('photo effect'))
     watermark = models.ForeignKey('Watermark', null=True, blank=True, related_name='photo_sizes', verbose_name=_('watermark image'))
 

@@ -131,6 +131,19 @@ class ImageResizeTest(PLTest):
         self.s.save()
         self.p = TestPhoto.objects.get(name='test')
         self.assertEquals(self.p.get_test_size(), self.s.size)
+        
+    def test_resize_no_upscale(self):
+        self.s.size = (2000, 2000)
+        self.s.save()
+        self.p = TestPhoto.objects.get(name='test')
+        self.assertEquals(self.p.get_test_size(), (1600, 1200))
+        
+    def test_resize_upscale(self):
+        self.s.size = (2000, 2000)
+        self.s.upscale = True
+        self.s.save()
+        self.p = TestPhoto.objects.get(name='test')
+        self.assertEquals(self.p.get_test_size(), (2000, 1500))
 
 
 class PhotoEffectTest(PLTest):

@@ -41,7 +41,7 @@ class PhotoSizeAdmin(admin.ModelAdmin):
             'fields': ('name', 'width', 'height', 'quality')
         }),
         ('Options', {
-            'fields': ('crop', 'pre_cache', 'increment_count')
+            'fields': ('upscale', 'crop', 'pre_cache', 'increment_count')
         }),
         ('Enhancements', {
             'fields': ('effect', 'watermark',)
