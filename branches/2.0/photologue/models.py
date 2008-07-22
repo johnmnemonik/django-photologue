@@ -344,9 +344,13 @@ class ImageModel(models.Model):
                     ratio = float(new_height)/cur_height
                 else:
                     ratio = float(new_width)/cur_width
-            im = im.resize((int(round(cur_width*ratio)),
-                            int(round(cur_height*ratio))),
-                           Image.ANTIALIAS)
+            new_dimensions = (int(round(cur_width*ratio)),
+                              int(round(cur_height*ratio)))
+            if new_dimensions[0] > cur_width or \
+               new_dimensions[1] > cur_height:
+                if not photosize.upscale:
+                    return im
+            im = im.resize(new_dimensions, Image.ANTIALIAS)
         return im
 
     def create_size(self, photosize):
@@ -365,10 +369,7 @@ class ImageModel(models.Model):
             im = photosize.effect.pre_process(im)
         # Resize/crop image
         if im.size != photosize.size:
-            if photosize.upscale or \
-               im.size[0] >= photosize.size[0] and \
-               im.size[1] >= photosize.size[1]:
-                im = self.resize_image(im, photosize)    
+            im = self.resize_image(im, photosize)    
         # Apply watermark if found
         if photosize.watermark is not None:
             im = photosize.watermark.post_process(im)   
