@@ -7,9 +7,10 @@ from django.test import TestCase
 from models import *
 
 # Path to sample image
-LANDSCAPE_IMAGE_PATH = os.path.join(os.path.dirname(__file__), 'res', 'test_landscape.jpg')
-PORTRAIT_IMAGE_PATH = os.path.join(os.path.dirname(__file__), 'res', 'test_portrait.jpg')
-SQUARE_IMAGE_PATH = os.path.join(os.path.dirname(__file__), 'res', 'test_square.jpg')
+RES_DIR = os.path.join(os.path.dirname(__file__), 'res')
+LANDSCAPE_IMAGE_PATH = os.path.join(RES_DIR, 'test_landscape.jpg')
+PORTRAIT_IMAGE_PATH = os.path.join(RES_DIR, 'test_portrait.jpg')
+SQUARE_IMAGE_PATH = os.path.join(RES_DIR, 'test_square.jpg')
 
 
 class TestUploadedFile(InMemoryUploadedFile):
