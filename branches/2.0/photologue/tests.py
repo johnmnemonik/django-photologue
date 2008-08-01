@@ -57,11 +57,11 @@ class PhotoTest(PLTest):
         self.assert_(len(self.pl.EXIF.keys()) > 0)
 
     def test_paths(self):
-        self.assertEqual(self.pl.cache_path(),
-                         os.path.join(settings.MEDIA_ROOT,
+        self.assertEqual(os.path.normpath(self.pl.cache_path()),
+                         os.path.normpath(os.path.join(settings.MEDIA_ROOT,
                                       PHOTOLOGUE_DIR,
                                       'photos',
-                                      'cache'))
+                                      'cache')))
         self.assertEqual(self.pl.cache_url(),
                          settings.MEDIA_URL + PHOTOLOGUE_DIR + '/photos/cache')
 
