@@ -1,30 +1,13 @@
-from admin import *
 from django.conf import settings
 from django.conf.urls.defaults import *
-from django.contrib import databrowse
 from models import *
 
 # Number of random images from the gallery to display.
 SAMPLE_SIZE = ":%s" % getattr(settings, 'GALLERY_SAMPLE_SIZE', 5)
 
-# admin
-urlpatterns = patterns('', 
-    (r'^admin/(.*)', photologue_admin.root),
-)
-
-# databrowse
-databrowse.site.register(Gallery)
-databrowse.site.register(Photo)
-databrowse.site.register(PhotoSize)
-databrowse.site.register(PhotoEffect)
-databrowse.site.register(Watermark)
-urlpatterns += patterns('',
-    (r'^browse/(.*)', databrowse.site.root),
-)
-
 # galleries
 gallery_args = {'date_field': 'date_added', 'allow_empty': True, 'queryset': Gallery.objects.filter(is_public=True), 'extra_context':{'sample_size':SAMPLE_SIZE}}
-urlpatterns += patterns('django.views.generic.date_based',
+urlpatterns = patterns('django.views.generic.date_based',
     url(r'^gallery/(?P<year>\d{4})/(?P<month>[a-z]{3})/(?P<day>\w{1,2})/(?P<slug>[\-\d\w]+)/$', 'object_detail', {'date_field': 'date_added', 'slug_field': 'title_slug', 'queryset': Gallery.objects.filter(is_public=True), 'extra_context':{'sample_size':SAMPLE_SIZE}}, name='pl-gallery-detail'),
     url(r'^gallery/(?P<year>\d{4})/(?P<month>[a-z]{3})/(?P<day>\w{1,2})/$', 'archive_day', gallery_args, name='pl-gallery-archive-day'),
     url(r'^gallery/(?P<year>\d{4})/(?P<month>[a-z]{3})/$', 'archive_month', gallery_args, name='pl-gallery-archive-month'),

@@ -51,21 +51,10 @@ class PhotoSizeAdmin(admin.ModelAdmin):
 class WatermarkAdmin(admin.ModelAdmin):
     list_display = ('name', 'opacity', 'style')
 
-# register the local admin
-photologue_admin = admin.AdminSite()
-photologue_admin.register(Gallery, GalleryAdmin)
-photologue_admin.register(GalleryUpload)
-photologue_admin.register(Photo, PhotoAdmin)
-photologue_admin.register(PhotoEffect, PhotoEffectAdmin)
-photologue_admin.register(PhotoSize, PhotoSizeAdmin)
-photologue_admin.register(Watermark, WatermarkAdmin)
 
-try:   
-    admin.site.register(Gallery, GalleryAdmin)
-    admin.site.register(GalleryUpload)
-    admin.site.register(Photo, PhotoAdmin)
-    admin.site.register(PhotoEffect, PhotoEffectAdmin)
-    admin.site.register(PhotoSize, PhotoSizeAdmin)
-    admin.site.register(Watermark, WatermarkAdmin)
-except:
-    pass
+admin.site.register(Gallery, GalleryAdmin)
+admin.site.register(GalleryUpload)
+admin.site.register(Photo, PhotoAdmin)
+admin.site.register(PhotoEffect, PhotoEffectAdmin)
+admin.site.register(PhotoSize, PhotoSizeAdmin)
+admin.site.register(Watermark, WatermarkAdmin)
