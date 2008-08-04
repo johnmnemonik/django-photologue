@@ -16,6 +16,7 @@ PhotoEffect = get_model(APP_NAME, 'PhotoEffect')
 
 def post_sync(sender, app, created_models, verbosity, interactive):
     if interactive:
+        print '\nInitializing %s' % APP_NAME
         msg = '\nPhotologue requires a specific photo size to display thumbnail previews in the Django admin application.\nWould you like to generate this size now? (yes, no):'
         if get_response(msg, lambda inp: inp == 'yes', False):
             admin_thumbnail = create_size('admin_thumbnail', width=100, height=75, crop=True, pre_cache=True)
