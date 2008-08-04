@@ -10,7 +10,10 @@ class Command(BaseCommand):
     can_import_settings = True
 
     def handle(self, args, **options):
-        return create_size(args)
+        return _create_size(args)
+        
+def _create_size(name):
+    create_size(name)
 
 def create_size(name, width=0, height=0, crop=False, pre_cache=False, increment_count=False):
     from django.db.models.loading import get_model
