@@ -6,7 +6,12 @@ from commands.plcreatesize import create_size
 from commands.utils import get_response
 
 APP_NAME = __name__.split('.')[0]
-models = __import__(APP_NAME).models
+
+try:
+    models = __import__(APP_NAME).models
+except:
+    models = None
+    
 PhotoEffect = get_model(APP_NAME, 'PhotoEffect')
 
 def post_sync(sender, app, created_models, verbosity, interactive):
