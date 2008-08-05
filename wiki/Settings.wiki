@@ -1,21 +1,21 @@
 The following settings can be over-ridden in your project's settings file:
 
 === PHOTOLOGUE_DIR ===
-Default: "photologue"
+Default: `"photologue"`
 
 The relative path from your `MEDIA_ROOT` setting where Photologue will save image files. If your MEDIA_ROOT is set to "/home/justin/media", photologue will upload your images to "/home/justin/media/photologue".
 
 === PHOTOLOGUE_MAXBLOCK ===
-Default: 256 * 2 ** 10
+Default: `256 * 2 ** 10`
 
 Sets the `ImageFile MAXBLOCK` setting.
 
 === SAMPLE_IMAGE_PATH ===
-Default: "%Photologue App Directory%/res/sample.jpg"
+Default: `"%Photologue App Directory%/res/sample.jpg"`
 
 The absolute path to the image file you wish to use as the sample image for Photo Effects in the Django admin. Image will not be resized by photologue.
 
 === GALLERY_SAMPLE_SIZE ===
-Default: 5
+Default: `5`
 
 The number of sample images to display in the generic views when listing multiple galleries.
