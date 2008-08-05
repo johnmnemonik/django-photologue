@@ -1,5 +1,3 @@
-= Photologue Settings =
-
 The following settings can be over-ridden in your project's settings file:
 
 === PHOTOLOGUE_DIR ===
