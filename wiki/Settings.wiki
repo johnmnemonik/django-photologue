@@ -13,7 +13,7 @@ Default: 256*1024
 Sets the ImageFile MAXBLOCK setting. Increasing this value may help if you run into this issue.
 
 === SAMPLE_IMAGE_PATH ===
-Default: "[Photologue App Directory]/res/sample.jpg"
+Default: "%Photologue App Directory%/res/sample.jpg"
 
 The absolute path to the image file you wish to use as the sample image for Photo Effects in the Django admin. Image will not be resized by photologue.
 
