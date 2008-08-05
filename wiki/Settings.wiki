@@ -8,7 +8,7 @@ The relative path from your `MEDIA_ROOT` setting where Photologue will save imag
 === PHOTOLOGUE_MAXBLOCK ===
 Default: 256*1024
 
-Sets the `ImageFile MAXBLOCK` setting. Increasing this value may help if you run into this issue.
+Sets the `ImageFile MAXBLOCK` setting.
 
 === SAMPLE_IMAGE_PATH ===
 Default: "%Photologue App Directory%/res/sample.jpg"
