@@ -1,4 +1,4 @@
-A Photologue Gallery is a named collection of photos. Galleries can be public or private, and they can be tagged. Photos are not restricted to a single gallery can belong to as many as you want.
+A Photologue Gallery is a named collection of photos. Galleries can be public or private, and they can be tagged. Photos are not restricted to a single gallery and can belong to as many as you want.
 
 == Methods ==
 Commonly used public methods include:
@@ -12,7 +12,7 @@ Returns a queryset containing the latest photos assigned to the gallery by date.
 }}}
 
 ==== Arguments: ====
-===== count =====
+===== limit =====
 default: 0 (returns all photos)
 
 The number of photos to return
