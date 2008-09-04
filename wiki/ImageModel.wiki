@@ -5,22 +5,22 @@ The ImageModel abstract base class encapsulates all of the core functionality of
 The following fields will be added to any model inheriting from the ImageModel base class. These field names will become reserved and can not be overridden in your subclass:
 
 === image ===
-Type: ImageField
+Type: [http://docs.djangoproject.com/en/dev/ref/models/fields/#model-field-types ImageField]
 
 Stores the file path of the original image.
 
 === date_taken ===
-Type: DateTimeField
+Type: [http://docs.djangoproject.com/en/dev/ref/models/fields/#model-field-types DateTimeField]
 
 The date the photo was originally taken. Photologue will attempt to determine this from the images EXIF data but will fall back to the date the model was created.
 
 === view_count ===
-Type: PositiveIntegerField
+Type: [http://docs.djangoproject.com/en/dev/ref/models/fields/#model-field-types PositiveIntegerField]
 
 The number of times a PhotoSize with increment_count set to true has been requested for this image.
 
 === crop_from ===
-Type: CharField
+Type: [http://docs.djangoproject.com/en/dev/ref/models/fields/#model-field-types CharField]
 
 The position that this image will be cropped from if required.
 
@@ -29,7 +29,7 @@ The position that this image will be cropped from if required.
 || || bottom || ||
 
 === effect ===
-Type: ForeignKey
+Type: [http://docs.djangoproject.com/en/dev/ref/models/fields/#module-django.db.models.fields.related ForeignKey]
 
 Explicitly applies a specific PhotoEffect to this image. This setting will override any effect applied to the PhotoSize requested.
 
