@@ -5,6 +5,27 @@ Default: `"photologue"`
 
 The relative path from your `MEDIA_ROOT` setting where Photologue will save image files. If your MEDIA_ROOT is set to "/home/justin/media", photologue will upload your images to "/home/justin/media/photologue".
 
+=== PHOTOLOGUE_PATH ===
+Specifies a "callable" that takes a model instance and the original uploaded filename and returns a relative path from your MEDIA_ROOT that the file will be saved. This function can be set directly.
+
+settings.py:
+
+{{{
+    # settings.py:
+    from utils import get_image_path
+    
+    PHOTOLOGUE_PATH = get_image_path
+}}}
+
+You can also pass a string path to the function.
+
+{{{
+    # settings.py:
+    PHOTOLOGUE_PATH = 'myapp.utils.get_image_path'
+}}}
+
+_This setting will override the PHOTOLOGUE_DIR setting if both are defined._
+
 === PHOTOLOGUE_MAXBLOCK ===
 Default: `256 * 2 ** 10`
 

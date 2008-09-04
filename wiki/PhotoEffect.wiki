@@ -26,6 +26,6 @@ Photologue can also add reflections to your images. You specify the size, streng
 http://django-photologue.googlecode.com/svn/docs/res/reflection_sample.jpg
 
 == Admin Preview ==
-Photologue automatically generates a sample image in the Django admin so that you can preview the effect (click image to enlarge).
+Photologue automatically generates a sample image in the Django admin so that you can preview the effects you define (click image to enlarge).
 
 [http://django-photologue.googlecode.com/svn/docs/res/admin_effect_preview.jpg http://django-photologue.googlecode.com/svn/docs/res/admin_effect_preview_thumbnail.jpg]
