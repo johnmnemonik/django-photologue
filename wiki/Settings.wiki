@@ -8,7 +8,12 @@ The relative path from your `MEDIA_ROOT` setting where Photologue will save imag
 === PHOTOLOGUE_PATH ===
 Specifies a "callable" that takes a model instance and the original uploaded filename and returns a relative path from your MEDIA_ROOT that the file will be saved. This function can be set directly.
 
-settings.py:
+{{{
+    # myapp/utils.py:
+    import os 
+    def get_image_path(instance, filename): 
+        return os.path.join('path', 'to', 'my', 'files', filename) 
+}}}
 
 {{{
     # settings.py:
