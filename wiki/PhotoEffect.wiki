@@ -20,6 +20,11 @@ Photo effects allow you to define specific effects and apply them to your photos
   
 _This list may change depending on the continued development of the Python Imaging Library._
 
+== Reflections ==
+Photologue can also add reflections to your images. You specify the size, strenght (opacity) and background color
+
+http://django-photologue.googlecode.com/svn/docs/res/reflection_sample.jpg
+
 == Admin Preview ==
 Photologue automatically generates a sample image in the Django admin so that you can preview the effect (click image to enlarge).
 
