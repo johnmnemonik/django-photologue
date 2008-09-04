@@ -1,3 +1,0 @@
-Documentation for the 1.0 release can be found [http://sites.google.com/a/justindriscoll.us/photologue/ here].
-
-The new documentation for the upcoming 2.0 release will be found here on project wiki. Anyone wishing to contribute documentation or tutorials is encouraged to do so.
