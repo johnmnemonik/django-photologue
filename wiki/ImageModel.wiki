@@ -1,0 +1,31 @@
+The `ImageModel` abstract base class encapsulates all of the core functionality of the Photologue Photo model. Django models that inherit from this class will be augmented with the basic fields and behavior required for them to provide image resizing and cacheing, view counts, enchancements and effects, reflections, watermarks, rotation, etc.
+
+== Fields ==
+
+The following fields will be added to any model inheriting from the `ImageModel` base class. These field names will become reserved and can not be overridden in your subclass:
+
+=== image ===
+ImageField
+Stores the file path of the original image.
+
+=== date_taken ===
+DateTimeField
+The date the photo was originally taken. Photologue will attempt to determine this from the images EXIF data but will fall back to the date the model was created.
+
+=== view_count ===
+PositiveIntegerField
+The number of times a PhotoSize with increment_count set to true has been requested for this image.
+
+=== crop_from ===
+CharField
+The position that this image will be cropped from if required.
+
+|| || top || ||
+|| left || center || right ||
+|| || bottom || ||
+
+=== image ===
+=== date_taken ===
+=== view_count ===
+=== crop_from ===
+=== effect ===
