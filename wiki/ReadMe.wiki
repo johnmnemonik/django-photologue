@@ -100,7 +100,7 @@ Offical docs:
     http://code.google.com/p/django-photologue/w/list
 }}}
 
-Discussion group:
+If you have any questions or need help with any aspect of Photologue please feel free to join the discussion group:
 
 {{{
     http://groups.google.com/group/django-photologue
