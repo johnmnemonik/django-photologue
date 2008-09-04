@@ -1,7 +1,7 @@
 The PhotoSize model can be viewed as a named set of parameters that Photologue uses to automatically resize and process your images. These paramters include output dimensions, compression quality, effects and watermarks. There is no limit to the number of PhotoSize models you can define and because Photologue only process your images when explicitly told to, you don't have to worry about your disk space being wasted.
 
 == How Photologue Resize Your Images ==
-PhotoSizes are very flexible in the way your images are resized. You can resize to a maximum width, height or both. You can also have Photologue crop your images to an exact set of dimensions.
+Photo sizes are very flexible in the way your images are resized. You can resize to a maximum width, height or both. You can also have Photologue crop your images to an exact set of dimensions.
 
 === Fit To A Box ===
 You can tell Photologue to resize you images to fit within a "box" by defining (non-zero value) both a width and height. If you define a PhotoSize that is 500 wide and 500 tall (no crop), portrait oriented images (taller than wide) will be resized proportionately to 500 pixels tall and landscape oriented images (wider than tall) will be resized to 500 pixels wide.
