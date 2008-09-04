@@ -85,7 +85,7 @@ When you inherit from the ImageModel class you get Photologues admin thumbnails 
 
 == Example ==
 
-Here is a (very) simple example of a custom model that inherits from the ImageModel abstract class.
+Here is a (very) simple, but real world, example of a custom model that inherits from the ImageModel abstract class.
 
 {{{
     from django.contrib.auth.models import User
