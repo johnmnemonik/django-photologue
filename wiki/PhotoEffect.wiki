@@ -25,6 +25,9 @@ Photologue can also add reflections to your images. You specify the size, streng
 
 http://django-photologue.googlecode.com/svn/docs/res/reflection_sample.jpg
 
+== Rotation ==
+The transpose_method property allows you to rotate and flip your processed images.
+
 == Admin Preview ==
 Photologue automatically generates a sample image in the Django admin so that you can preview the effects you define (click image to enlarge).
 
