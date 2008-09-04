@@ -1,0 +1,14 @@
+The PhotoSize model can be viewed as a named set of parameters that Photologue uses to automatically resize and process your images. These paramters include output dimensions, compression quality, effects and watermarks. There is no limit to the number of PhotoSize models you can define and because Photologue only process your images when explicitly told to, you don't have to worry about your disk space being wasted.
+
+== How PhotoSizes Resize Your Images ==
+PhotoSizes are very flexible in the way your images are resized. You can resize to a maximum width, height or both. You can also have Photologue crop your images to an exact set of dimensions.
+
+=== Fit To A Box ===
+You can tell Photologue to resize you images to fit within a "box" by defining (non-zero value) both a width and height. If you define a PhotoSize that is 500 wide and 500 tall (no crop), portrait oriented images (taller than wide) will be resized proportionately to 500 pixels tall and landscape oriented images (wider than tall) will be resized to 500 pixels wide.
+
+=== Fit To One Dimension ===
+If you only define ONE dimension in a PhotoSize, either width or height, and leave the other set to zero your photos will be resized proportionally to the one defined dimension regardless of the size of the image. If you define a PhotoSize that is 700 wide (no crop) and 0 high. An image that is 1800 pixels tall by 1400 pixels wide will be resized to 900 pixels tall by 700 pixels wide. An image that is 400 pixels tall by 1400 pixels wide will be resized to 200 pixels tall by 700 pixels wide.
+
+=== Crop To Fit ===
+By checking the "crop" check box for a PhotoSize your images will be resized to the exact dimensions you specify (*note: you must specify both a width and height for cropped PhotoSizes*), cropping any areas that do not fit as specified by that individual photo's "crop_from" property.
+ 
