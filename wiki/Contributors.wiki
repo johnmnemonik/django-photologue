@@ -2,7 +2,7 @@ These are some of the people who have contributed to the development of Photolog
 
 If I've carelessly left you off this list, or you wish to have your entry changed, expanded upon or removed, please send me an email or post a message in the discussion board.
 
-In no particular order:
+== In no particular order: ==
   * Dave Lower
   * Bernd Schlapsi
   * Ariel Mauricio Nunez Gomez
