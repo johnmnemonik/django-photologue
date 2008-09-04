@@ -40,7 +40,4 @@ If True, this PhotoSize will increment an images view_count property when it's U
 Specifies a PhotoEffect to apply to images when processed.
 
 === watermark ===
-Specifies a Watermark to apply to images when processed.
-
-
-
+Specifies a [Watermark] to apply to images when processed.
