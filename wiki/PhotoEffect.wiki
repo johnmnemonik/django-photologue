@@ -1,0 +1,26 @@
+Photo effects allow you to define specific effects and apply them to your photos and photo sizes. Photologue leverages the Python Imaging Library to provide the following adjustments and filters:
+
+== Adjustments ==
+  * Color
+  * Brightness
+  * Contrast
+  * Sharpness
+  
+== Filters ==
+  * Blur
+  * Contour
+  * Detail
+  * Edge Enhance
+  * Edge Enhance More
+  * Emboss
+  * Find Edges
+  * Sharpen
+  * Smooth
+  * Smooth More
+  
+_This list may change depending on the continued development of the Python Imaging Library._
+
+== Admin Preview ==
+Photologue automatically generates a sample image in the Django admin so that you can preview the effect.
+
+[http://django-photologue.googlecode.com/svn/docs/res/admin_effect_preview.jpg http://django-photologue.googlecode.com/svn/docs/res/admin_effect_preview_thumbnail.jpg]
