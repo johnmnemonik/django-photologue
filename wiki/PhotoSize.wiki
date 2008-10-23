@@ -19,7 +19,7 @@ By checking the "crop" check box for a PhotoSize your images will be resized to 
 Apart from it's "name", each of the properties in the PhotoSize model tell Photologue how to process your images.
 
 === name ===
-A descriptive name for this PhotoSize. The "name" property is used to provide special methods to the Photo model and other ImageModel subclasses. PhotoSize names should contain only letters, numbers and underscores. Examples: "thumbnail", "display", "small", "main_page_widget". This is not currently enforced at the model level but will cause problems with the system tries to add the method "get_my *awesome* size!!!!!111_url" to your photo model objects.
+A descriptive name for this PhotoSize. The "name" property is used to provide special methods to the Photo model and other ImageModel subclasses. PhotoSize names should contain only letters, numbers and underscores. Examples: "thumbnail", "display", "small", "main_page_widget". This is not currently enforced at the model level but will cause problems when the system tries to add the method "get_my *awesome* size!!!!!111_url" to your photo model objects.
 
 === width & height ===
 Specifies the width and height of the output file in pixels. See above to learn how Photologue uses these values to resize your source images.
