@@ -9,6 +9,9 @@ You can tell Photologue to resize you images to fit within a "box" by defining (
 === Fit To One Dimension ===
 If you only define ONE dimension in a PhotoSize, either width or height, and leave the other set to zero your photos will be resized proportionally to the one defined dimension regardless of the size of the image. If you define a PhotoSize that is 700 wide (no crop) and 0 high. An image that is 1800 pixels tall by 1400 pixels wide will be resized to 900 pixels tall by 700 pixels wide. An image that is 400 pixels tall by 1400 pixels wide will be resized to 200 pixels tall by 700 pixels wide.
 
+=== No Resize (r351) ===
+If you define a PhotoSize with both the height and width set to zero Photologue will apply all appropriate effects and watermarks but will not resize the image. Please note that this is provided only so for instances where you need to apply effects or watermarks to an image and do not want it resized. You should not use this as a way of getting the original image as there is a small loss of quality when the image is resaved. The method `get_image_url()` method will return the original uploaded image file.
+
 === Crop To Fit ===
 By checking the "crop" check box for a PhotoSize your images will be resized to the exact dimensions you specify (*note: you must specify both a width and height if "crop" is True), cropping any areas that do not fit as specified by that individual photo's "crop_from" property.
  
