@@ -18,3 +18,11 @@ it when I put thickbox on the gallery display."
 http://pinax.hotcluboffrance.com/
 
 Pinax is a Django project intended to provide a starting point for websites. By integrating numerous reusable Django apps to take care of the things that many sites have in common, it lets you focus on what makes your site different.
+
+http://www.martasmaldone.com
+
+Andrea Valenti writes: "Marta Smaldone's website is related to photo-journalism and
+photo-reportage made on several topics (Immigration,
+Brussels/Belgium and more are coming).
+The website and the projects are currently available in
+French (localization on-going)."
