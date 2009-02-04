@@ -1,5 +1,5 @@
 include README.txt
 include LICENSE.txt
 recursive-include photologue/locale *
-recursive-include photologue/templates/photologue/ *
-recursive-include photologue/res/ *
+recursive-include photologue/templates/photologue *
+recursive-include photologue/res *
