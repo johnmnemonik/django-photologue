@@ -31,7 +31,7 @@ for dirpath, dirnames, filenames in os.walk(SOURCE_DIR):
         data_files.append([dirpath, [os.path.join(dirpath, f) for f in filenames]])
 
 setup(
-    name = "photologue",
+    name = "django-photologue",
     version = version,
     description = "Powerful image management for the Django web framework.",
     author = "Justin Driscoll",
@@ -43,7 +43,7 @@ setup(
                 'photologue.templatetags',
                 'photologue.utils'],
     data_files = data_files,
-    classifiers = ['Development Status :: 4 - Beta',
+    classifiers = ['Development Status :: 5 - Production/Stable',
                    'Environment :: Web Environment',
                    'Framework :: Django',
                    'Intended Audience :: Developers',

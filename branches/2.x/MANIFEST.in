@@ -1,6 +1,5 @@
-include photologue/res/*.jpg
-include photologue/templates/photologue/*.html
-include photologue/locale/*.mo
-include photologue/locale/*.po
 include README.txt
 include LICENSE.txt
+recursive-include photologue/locale *
+recursive-include photologue/templates/photologue/ *
+recursive-include photologue/res/ *
