@@ -77,7 +77,7 @@ When you inherit from the ImageModel class you get Photologues admin thumbnails 
 {{{
     from myapp.models import MyPhoto
     
-    MyPhotoAdmin(admin.ModelAdmin):
+    class MyPhotoAdmin(admin.ModelAdmin):
         list_display = ['title', 'admin_thumbnail']
         
     admin.site.register(MyPhoto, MyPhotoAdmin)
