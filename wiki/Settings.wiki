@@ -50,3 +50,8 @@ The number of sample images to display in the generic views when listing multipl
 Default: `None`
 
 If not None or 0 (Zero) this will limit the number of images returned from `Gallery.latest()`.
+
+=== PHOTOLOGUE_IMAGE_FIELD_MAX_LENGTH ===
+Default: `100`
+
+The integer value passed as `max_length` to the ImageModel's Image Field.
