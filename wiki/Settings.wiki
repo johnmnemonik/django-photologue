@@ -46,7 +46,7 @@ Default: `5`
 
 The number of sample images to display in the generic views when listing multiple galleries.
 
-=== PHOTOLOGUE_DEFAULT_LIMIT ===
+=== PHOTOLOGUE_GALLERY_LATEST_LIMIT ===
 Default: `None`
 
 If not None or 0 (Zero) this will limit the number of images returned from `Gallery.latest()`.
