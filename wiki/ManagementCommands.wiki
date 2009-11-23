@@ -37,5 +37,5 @@ You can also specify a list of photo size names to flush.
 This command initiates the Photologue initialization routine and prompts you to create a number of default photo sizes and effects. This command takes no arguments.
 
 {{{
-    pythons manage.py plinit
+    python manage.py plinit
 }}}
